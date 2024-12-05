@@ -29,3 +29,7 @@ lerna-debug.log*
 
 # turbo
 .turbo
+
+# build
+build/
+dist/

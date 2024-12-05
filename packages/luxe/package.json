@@ -1,0 +1,31 @@
+{
+  "name": "luxecms",
+  "version": "0.0.1",
+  "description": "The first modular CMS",
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "bin": {
+    "luxe": "./dist/luxe.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@types/yargs": "^17.0.33",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.1"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.8.2",
+    "@hono/node-server": "^1.13.7",
+    "cosmiconfig": "^9.0.0",
+    "hono": "^4.6.12",
+    "kleur": "^4.1.5",
+    "stacktrace-parser": "^0.1.10",
+    "yargs": "^17.7.2",
+    "zod": "^3.23.8"
+  }
+}
