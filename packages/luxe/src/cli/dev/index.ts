@@ -1,10 +1,10 @@
 import type { ArgumentsCamelCase } from "yargs";
-import { readRootLuxeConfigFile } from "~/core/config";
+import { loadLuxeConfigFile } from "~/core/config";
 import { LuxeError } from "~/core/errors";
 
 export const dev = async (argv: ArgumentsCamelCase<object>) => {
   try {
-    const config = await readRootLuxeConfigFile();
+    const config = await loadLuxeConfigFile();
     const modules = config.modules;
     const plugins = config.plugins;
 

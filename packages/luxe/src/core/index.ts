@@ -8,24 +8,25 @@ interface LuxeCorePluginConfig {
   name: string;
 }
 
-export type LuxeCoreConfig = {
+export type LuxeConfig = {
   modules: LuxeCoreModuleConfig[];
   plugins: LuxeCorePluginConfig[];
 };
 
-export const defineLuxeConfig = (config: LuxeCoreConfig): void => {
+export const defineLuxeConfig = (
+  config: LuxeConfig,
+): LuxeConfig | undefined => {
   try {
-    validateConfig(config);
+    return validateConfig(config);
   } catch (error) {
     if (error instanceof LuxeError) {
-      console.error(error.toString());
-    } else {
-      console.error(error);
+      throw error;
     }
+    throw LuxeErrors.Config.FailedToParse;
   }
 };
 
-const validateConfig = (config: LuxeCoreConfig): void => {
+const validateConfig = (config: LuxeConfig): LuxeConfig => {
   if (!config) {
     throw LuxeErrors.Config.Empty;
   }
@@ -57,4 +58,6 @@ const validateConfig = (config: LuxeCoreConfig): void => {
     }
     names.add(plugin.name);
   }
+
+  return config;
 };

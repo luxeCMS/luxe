@@ -1,0 +1,16 @@
+{
+  "name": "luxe-scripts",
+  "version": "0.0.1",
+  "description": "Internal scripts for LuxeCMS",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "luxe-scripts": "./index.js"
+  },
+  "dependencies": {
+    "@types/glob": "^8.1.0",
+    "esbuild": "^0.24.0",
+    "glob": "^11.0.0"
+  }
+}

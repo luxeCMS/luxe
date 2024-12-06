@@ -154,12 +154,12 @@ export const LuxeErrors = {
   Config: {
     NoRoot: new LuxeError({
       code: "NO_PROJECT_ROOT_FOUND",
-      message: "Could not find the root of your project",
+      message: "Could not find the root of project",
       hint: "Make sure you are running this command from within a Luxe project.",
     }),
     NoConfigFile: new LuxeError({
       code: "NO_CONFIG_FILE_FOUND",
-      message: "Could not find a Luxe configuration file in your project root",
+      message: "Could not find a Luxe configuration file in project root",
       hint: "Make sure you have a Luxe configuration file in the root of your project.",
     }),
     NoDefaultExport: new LuxeError({
@@ -193,5 +193,20 @@ export const LuxeErrors = {
         message: `Duplicate ${type} name: ${name}`,
         hint: `Make sure each ${type} in your configuration file has a unique name.`,
       }),
+    FailedToBuildTs: new LuxeError({
+      code: "FAILED_TO_BUILD_TS",
+      message: "Failed to build typescript configuration file",
+      hint: "Do you happen to have a syntax error in your configuration file?",
+    }),
+    FailedToDynamicImport: new LuxeError({
+      code: "FAILED_TO_DYNAMIC_IMPORT",
+      message: "Failed to dynamically import configuration file",
+      hint: "Do you happen to have a syntax error in your configuration file?",
+    }),
+    FailedToParse: new LuxeError({
+      code: "FAILED_TO_PARSE_CONFIG",
+      message: "Failed to parse configuration file",
+      hint: "Do you happen to have a syntax error in your configuration file?",
+    }),
   },
 } as const;

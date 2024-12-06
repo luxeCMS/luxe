@@ -1,10 +1,11 @@
 import { defineLuxeConfig } from "luxecms";
 
-export default defineLuxeConfig({
+const config = defineLuxeConfig({
   modules: [
     {
       name: "HelloWorldModule",
     },
   ],
-  plugins: [],
+  plugins: {},
 });
+export default config;
