@@ -1,4 +1,4 @@
-import { defineLuxeConfig } from "../../../src/core";
+import { defineLuxeConfig } from "../../../src/core/index.js";
 
 export default defineLuxeConfig({
   modules: [

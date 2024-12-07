@@ -1,8 +1,8 @@
-import type { LuxeConfig } from "..";
+import type { LuxeConfig } from "../index.js";
 import path from "node:path";
 import fs from "node:fs/promises";
 import { pathToFileURL } from "node:url";
-import { LuxeError, LuxeErrors } from "../errors";
+import { LuxeError, LuxeErrors } from "../errors/index.js";
 
 /**
  * Find the root of the project by searching up for a package.json file
@@ -11,33 +11,33 @@ import { LuxeError, LuxeErrors } from "../errors";
  * @throws {LuxeError} if the project root could not be found
  */
 export const findProjectRoot = async (startPath: string): Promise<string> => {
-  try {
-    const stats = await fs.stat(startPath);
-    if (!stats.isDirectory()) {
-      throw LuxeErrors.Config.NoRoot;
-    }
-  } catch {
-    throw LuxeErrors.Config.NoRoot;
-  }
+	try {
+		const stats = await fs.stat(startPath);
+		if (!stats.isDirectory()) {
+			throw LuxeErrors.Config.NoRoot;
+		}
+	} catch {
+		throw LuxeErrors.Config.NoRoot;
+	}
 
-  let currentPath = path.resolve(startPath);
-  let maxDepth = 2;
+	let currentPath = path.resolve(startPath);
+	let maxDepth = 2;
 
-  while (currentPath !== path.parse(currentPath).root && maxDepth > 0) {
-    try {
-      maxDepth--;
-      const packagePath = path.join(currentPath, "package.json");
-      const stats = await fs.stat(packagePath);
+	while (currentPath !== path.parse(currentPath).root && maxDepth > 0) {
+		try {
+			maxDepth--;
+			const packagePath = path.join(currentPath, "package.json");
+			const stats = await fs.stat(packagePath);
 
-      if (stats.isFile()) {
-        return currentPath;
-      }
-    } catch {
-      currentPath = path.dirname(currentPath);
-    }
-  }
+			if (stats.isFile()) {
+				return currentPath;
+			}
+		} catch {
+			currentPath = path.dirname(currentPath);
+		}
+	}
 
-  throw LuxeErrors.Config.NoRoot;
+	throw LuxeErrors.Config.NoRoot;
 };
 
 /**
@@ -47,24 +47,24 @@ export const findProjectRoot = async (startPath: string): Promise<string> => {
  * @throws {LuxeError} if the configuration file could not be compiled
  */
 export const buildTsConfig = async (configPath: string) => {
-  const { build } = await import("esbuild");
-  const result = await build({
-    entryPoints: [configPath],
-    bundle: true,
-    write: false,
-    format: "esm",
-    target: "node18",
-    platform: "node",
-    packages: "external",
-    mainFields: ["module", "main"],
-    conditions: ["import", "default"],
-  });
+	const { build } = await import("esbuild");
+	const result = await build({
+		entryPoints: [configPath],
+		bundle: true,
+		write: false,
+		format: "esm",
+		target: "node18",
+		platform: "node",
+		packages: "external",
+		mainFields: ["module", "main"],
+		conditions: ["import", "default"],
+	});
 
-  if (!result.outputFiles?.[0]) {
-    throw LuxeErrors.Config.FailedToBuildTs;
-  }
+	if (!result.outputFiles?.[0]) {
+		throw LuxeErrors.Config.FailedToBuildTs;
+	}
 
-  return result.outputFiles[0].text;
+	return result.outputFiles[0].text;
 };
 
 /**
@@ -78,36 +78,36 @@ export const buildTsConfig = async (configPath: string) => {
  * @throws {LuxeError} if the configuration file could not be loaded
  */
 export const importConfigFile = async (
-  configPath: string,
+	configPath: string,
 ): Promise<LuxeConfig | undefined> => {
-  const fileUrl = pathToFileURL(configPath).href;
-  const ext = path.extname(configPath);
+	const fileUrl = pathToFileURL(configPath).href;
+	const ext = path.extname(configPath);
 
-  if (ext === ".ts") {
-    const tmpFile = configPath.replace(/\.ts$/, ".js");
-    try {
-      const tsOutput = await buildTsConfig(configPath);
-      await fs.writeFile(tmpFile, tsOutput);
-      const mod = await import(pathToFileURL(tmpFile).href);
-      await fs.unlink(tmpFile);
-      if (!mod.default) {
-        throw LuxeErrors.Config.NoDefaultExport;
-      }
-      return mod.default;
-    } catch (error) {
-      await fs.unlink(tmpFile)?.catch(() => {});
-      if (error instanceof LuxeError) {
-        throw error;
-      }
-      throw LuxeErrors.Config.FailedToDynamicImport;
-    }
-  }
+	if (ext === ".ts") {
+		const tmpFile = configPath.replace(/\.ts$/, ".js");
+		try {
+			const tsOutput = await buildTsConfig(configPath);
+			await fs.writeFile(tmpFile, tsOutput);
+			const mod = await import(pathToFileURL(tmpFile).href);
+			await fs.unlink(tmpFile);
+			if (!mod.default) {
+				throw LuxeErrors.Config.NoDefaultExport;
+			}
+			return mod.default;
+		} catch (error) {
+			await fs.unlink(tmpFile)?.catch(() => {});
+			if (error instanceof LuxeError) {
+				throw error;
+			}
+			throw LuxeErrors.Config.FailedToDynamicImport;
+		}
+	}
 
-  const mod = (await import(fileUrl)) as { default?: LuxeConfig };
-  if (!mod.default) {
-    throw LuxeErrors.Config.NoDefaultExport;
-  }
-  return mod.default;
+	const mod = (await import(fileUrl)) as { default?: LuxeConfig };
+	if (!mod.default) {
+		throw LuxeErrors.Config.NoDefaultExport;
+	}
+	return mod.default;
 };
 
 /**
@@ -117,32 +117,32 @@ export const importConfigFile = async (
  * @throws {LuxeConfigError} if the configuration file is not found or invalid
  */
 export const loadLuxeConfigFile = async (
-  cwd = process.cwd(),
+	cwd = process.cwd(),
 ): Promise<LuxeConfig> => {
-  const projectRoot = await findProjectRoot(cwd).catch((error) => {
-    if (error instanceof LuxeError) {
-      throw error;
-    }
-    throw LuxeErrors.Config.NoRoot;
-  });
+	const projectRoot = await findProjectRoot(cwd).catch((error) => {
+		if (error instanceof LuxeError) {
+			throw error;
+		}
+		throw LuxeErrors.Config.NoRoot;
+	});
 
-  const configFiles = ["luxe.config.ts", "luxe.config.js", "luxe.config.mjs"];
+	const configFiles = ["luxe.config.ts", "luxe.config.js", "luxe.config.mjs"];
 
-  for (const file of configFiles) {
-    const filePath = path.join(projectRoot, file);
-    try {
-      await fs.access(filePath);
-      const config = await importConfigFile(filePath);
-      if (config) {
-        return config;
-      }
-      throw LuxeErrors.Config.NoConfigFile;
-    } catch (error) {
-      if (error instanceof LuxeError) {
-        throw error;
-      }
-    }
-  }
+	for (const file of configFiles) {
+		const filePath = path.join(projectRoot, file);
+		try {
+			await fs.access(filePath);
+			const config = await importConfigFile(filePath);
+			if (config) {
+				return config;
+			}
+			throw LuxeErrors.Config.NoConfigFile;
+		} catch (error) {
+			if (error instanceof LuxeError) {
+				throw error;
+			}
+		}
+	}
 
-  throw LuxeErrors.Config.NoConfigFile;
+	throw LuxeErrors.Config.NoConfigFile;
 };

@@ -1,4 +1,3 @@
-import { defineLuxeConfig } from "~/core";
-import {} from "~/server";
+import { defineLuxeConfig } from "~/core/index.js";
 
 export { defineLuxeConfig };

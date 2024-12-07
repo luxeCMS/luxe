@@ -1,5 +1,3 @@
 {
-  "name": "ts-valid-config",
-  "version": "0.0.1",
-  "description": "A package with a valid typescript config"
+  "type": "module"
 }
