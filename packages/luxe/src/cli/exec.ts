@@ -7,6 +7,11 @@ export const exec = () => {
   return yargs(hideBin(process.argv))
     .scriptName("luxe")
     .usage("$0 <cmd> [args]")
+    .option("verbose", {
+      alias: "v",
+      type: "boolean",
+      description: "Run with verbose logging",
+    })
     .command(
       "dev",
       "Start the development server",

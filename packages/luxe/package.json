@@ -4,7 +4,8 @@
   "description": "The first modular CMS",
   "scripts": {
     "dev": "luxe-scripts dev",
-    "build": "luxe-scripts build && tsc"
+    "build": "luxe-scripts build && tsc",
+    "test": "vitest"
   },
   "exports": {
     ".": {
@@ -19,9 +20,11 @@
   "devDependencies": {
     "@types/node": "^20.11.17",
     "@types/yargs": "^17.0.33",
+    "@vitest/coverage-v8": "^2.1.8",
     "luxe-scripts": "workspace:*",
     "tsup": "^8.0.2",
-    "tsx": "^4.7.1"
+    "tsx": "^4.7.1",
+    "vitest": "^2.1.8"
   },
   "dependencies": {
     "@clack/prompts": "^0.8.2",

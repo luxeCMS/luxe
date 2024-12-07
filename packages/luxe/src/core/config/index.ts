@@ -10,84 +10,104 @@ import { LuxeError, LuxeErrors } from "../errors";
  * @returns the path to the project root
  * @throws {LuxeError} if the project root could not be found
  */
-const findProjectRoot = async (startPath: string): Promise<string> => {
-  let currentPath = startPath;
-  let maxDepth = 5;
+export const findProjectRoot = async (startPath: string): Promise<string> => {
+  try {
+    const stats = await fs.stat(startPath);
+    if (!stats.isDirectory()) {
+      throw LuxeErrors.Config.NoRoot;
+    }
+  } catch {
+    throw LuxeErrors.Config.NoRoot;
+  }
+
+  let currentPath = path.resolve(startPath);
+  let maxDepth = 2;
+
   while (currentPath !== path.parse(currentPath).root && maxDepth > 0) {
     try {
       maxDepth--;
-      await fs.access(path.join(currentPath, "package.json"));
-      return currentPath;
+      const packagePath = path.join(currentPath, "package.json");
+      const stats = await fs.stat(packagePath);
+
+      if (stats.isFile()) {
+        return currentPath;
+      }
     } catch {
       currentPath = path.dirname(currentPath);
     }
   }
+
   throw LuxeErrors.Config.NoRoot;
 };
 
 /**
- * Load the configuration file from the given path; supports both JS and TS files
+ * Compile the given TS configuration file using esbuild
+ * @param configPath the path to the configuration file
+ * @returns the compiled configuration file as a string
+ * @throws {LuxeError} if the configuration file could not be compiled
+ */
+export const buildTsConfig = async (configPath: string) => {
+  const { build } = await import("esbuild");
+  const result = await build({
+    entryPoints: [configPath],
+    bundle: true,
+    write: false,
+    format: "esm",
+    target: "node18",
+    platform: "node",
+    packages: "external",
+    mainFields: ["module", "main"],
+    conditions: ["import", "default"],
+  });
+
+  if (!result.outputFiles?.[0]) {
+    throw LuxeErrors.Config.FailedToBuildTs;
+  }
+
+  return result.outputFiles[0].text;
+};
+
+/**
+ * Load the configuration file from the given path; supports .js, .mjs and .ts files
  *
  * When loading a TS file, it will be compiled using esbuild and then imported as an esm module
+ * and the temporary compiled file will be deleted after the import
  *
  * @param configPath the path to the configuration file
  * @returns the configuration object
+ * @throws {LuxeError} if the configuration file could not be loaded
  */
-const importConfigFile = async (configPath: string) => {
+export const importConfigFile = async (
+  configPath: string,
+): Promise<LuxeConfig | undefined> => {
   const fileUrl = pathToFileURL(configPath).href;
   const ext = path.extname(configPath);
 
   if (ext === ".ts") {
+    const tmpFile = configPath.replace(/\.ts$/, ".js");
     try {
-      const { build } = await import("esbuild");
-      const result = await build({
-        entryPoints: [configPath],
-        bundle: true,
-        write: false,
-        format: "esm",
-        target: "node18",
-        platform: "node",
-        packages: "external",
-        mainFields: ["module", "main"],
-        conditions: ["import", "default"],
-      });
-      const { outputFiles } = result;
-      if (!outputFiles?.[0]) {
-        throw LuxeErrors.Config.FailedToBuildTs;
+      const tsOutput = await buildTsConfig(configPath);
+      await fs.writeFile(tmpFile, tsOutput);
+      const mod = await import(pathToFileURL(tmpFile).href);
+      await fs.unlink(tmpFile);
+      if (!mod.default) {
+        throw LuxeErrors.Config.NoDefaultExport;
       }
-
-      const tmpFile = configPath.replace(/\.ts$/, ".js");
-      await fs.writeFile(tmpFile, outputFiles[0].text);
-
-      try {
-        const mod = await import(pathToFileURL(tmpFile).href);
-        // await fs.unlink(tmpFile);
-        console.log("MOD_DEFAULT", mod.default);
-        return mod.default as LuxeConfig;
-      } catch (error) {
-        // await fs.unlink(tmpFile).catch(() => {});
-        if (error instanceof LuxeError) {
-          throw error;
-        }
-        throw LuxeErrors.Config.FailedToDynamicImport;
-      }
+      return mod.default;
     } catch (error) {
+      await fs.unlink(tmpFile)?.catch(() => {});
       if (error instanceof LuxeError) {
         throw error;
       }
-      throw LuxeErrors.Config.FailedToBuildTs;
+      throw LuxeErrors.Config.FailedToDynamicImport;
     }
   }
 
-  try {
-    const mod = (await import(fileUrl)) as { default?: LuxeConfig };
-    return mod.default;
-  } catch (error) {
-    if (error instanceof LuxeError) {
-      throw error;
-    }
-    throw LuxeErrors.Config.FailedToDynamicImport;
+  const mod = (await import(fileUrl)) as { default?: LuxeConfig };
+  if (!mod.default) {
+    throw LuxeErrors.Config.NoDefaultExport;
   }
+  return mod.default;
 };
 
 /**
@@ -99,32 +119,30 @@ const importConfigFile = async (configPath: string) => {
 export const loadLuxeConfigFile = async (
   cwd = process.cwd(),
 ): Promise<LuxeConfig> => {
-  let projectRoot: string | null = null;
-  try {
-    projectRoot = await findProjectRoot(cwd);
-  } catch (error) {
+  const projectRoot = await findProjectRoot(cwd).catch((error) => {
     if (error instanceof LuxeError) {
       throw error;
     }
     throw LuxeErrors.Config.NoRoot;
-  }
+  });
+
   const configFiles = ["luxe.config.ts", "luxe.config.js", "luxe.config.mjs"];
+
   for (const file of configFiles) {
     const filePath = path.join(projectRoot, file);
     try {
       await fs.access(filePath);
       const config = await importConfigFile(filePath);
-      console.log(config);
-      if (!config) {
-        throw LuxeErrors.Config.NoDefaultExport;
+      if (config) {
+        return config;
       }
-      return config;
+      throw LuxeErrors.Config.NoConfigFile;
     } catch (error) {
       if (error instanceof LuxeError) {
         throw error;
       }
-      throw LuxeErrors.Config.NoConfigFile;
     }
   }
+
   throw LuxeErrors.Config.NoConfigFile;
 };

@@ -1,4 +1,5 @@
 import * as fs from "node:fs";
+import { LuxeErrors } from "../errors";
 
 export const safeImport = async <T = unknown>(fileUrl: string) => {
   try {
