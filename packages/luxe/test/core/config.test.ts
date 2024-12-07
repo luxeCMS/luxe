@@ -9,6 +9,12 @@ import {
 } from "../../src/core/config/index.js";
 import { LuxeErrors } from "../../src/core/errors/index.js";
 
+/**
+ * Get the path to a config file in a fixture directory.
+ * @param fixture the name of the fixture
+ * @param ext the extension of the config file
+ * @returns a string with the path to the config file
+ */
 const getConfigPathFromFixture = async (
   fixture: string,
   ext: "ts" | "js" | "mjs" = "ts",

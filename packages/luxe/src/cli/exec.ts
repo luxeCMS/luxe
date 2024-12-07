@@ -1,8 +1,11 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { LuxeError } from "~/core/errors/index.js";
 import { dev } from "./dev/index.js";
 
+/**
+ * This is the real entry point of the CLI. It uses yargs to parse the
+ * command line arguments and then runs the appropriate command.
+ */
 export const exec = () => {
   return yargs(hideBin(process.argv))
     .scriptName("luxe")
@@ -25,15 +28,5 @@ export const exec = () => {
       },
       dev,
     )
-    .fail((msg, err, yargs) => {
-      if (err) {
-        if (err instanceof LuxeError) {
-          console.error(err.toString());
-        } else {
-          console.error(err);
-        }
-      }
-      yargs.showHelp();
-    })
     .parse();
 };

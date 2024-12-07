@@ -3,18 +3,24 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { LuxeError, LuxeErrors } from "../errors/index.js";
 
+/**
+ * The configuration object for a Luxe module.
+ */
 interface LuxeCoreModuleConfig {
   name: string;
 }
 
+/**
+ * The configuration object for a Luxe plugin.
+ */
 interface LuxeCorePluginConfig {
   name: string;
 }
 
 /**
- * The Luxe configuration object
+ * The Luxe configuration object.
  *
- * This object is used to define the modules and plugins that should be loaded by Luxe
+ * This object is used to define the modules and plugins that should be loaded by Luxe.
  */
 export type LuxeConfig = {
   modules: LuxeCoreModuleConfig[];
@@ -22,7 +28,7 @@ export type LuxeConfig = {
 };
 
 /**
- * Find the root of the project by searching up for a package.json file
+ * Find the root of the project by searching up for a package.json file.
  * @param startPath the path to start searching from
  * @returns the path to the project root
  * @throws {LuxeError} if the project root could not be found
@@ -58,7 +64,7 @@ export const findProjectRoot = async (startPath: string): Promise<string> => {
 };
 
 /**
- * Compile the given TS configuration file using esbuild
+ * Compile the given TS configuration file using esbuild.
  * @param configPath the path to the configuration file
  * @returns the compiled configuration file as a string
  * @throws {LuxeError} if the configuration file could not be compiled
@@ -85,10 +91,10 @@ export const buildTsConfig = async (configPath: string) => {
 };
 
 /**
- * Load the configuration file from the given path; supports .js, .mjs and .ts files
+ * Load the configuration file from the given path; supports .js, .mjs and .ts files.
  *
  * When loading a TS file, it will be compiled using esbuild and then imported as an esm module
- * and the temporary compiled file will be deleted after the import
+ * and the temporary compiled file will be deleted after the import.
  *
  * @param configPath the path to the configuration file
  * @returns the configuration object
@@ -128,7 +134,7 @@ export const importConfigFile = async (
 };
 
 /**
- * Read the Luxe configuration file from the root of the project
+ * Read the Luxe configuration file from the root of the project.
  * @param cwd the current working directory (default: process.cwd())
  * @returns the LuxeCoreConfig object
  * @throws {LuxeConfigError} if the configuration file is not found or invalid
@@ -165,7 +171,11 @@ export const loadLuxeConfigFile = async (
 };
 
 /**
- * Validate the given configuration object
+ * Validate the given configuration object.
+ *
+ * This function checks all properties of the configuration object and throws an error if any are invalid
+ * or missing. It also validates each module and plugin.
+ *
  * @param config the configuration object to validate
  * @returns the validated configuration object
  * @throws {LuxeError} if the configuration object is invalid
