@@ -18,6 +18,7 @@ interface CodeFrame {
 }
 
 export class LuxeError extends Error {
+  readonly type: string;
   code: string;
   hint: string;
   name: string;
@@ -35,12 +36,22 @@ export class LuxeError extends Error {
     const _hint =
       opts?.hint ?? "Sorry, you're on your own with this one. Good luck!";
     super(_message);
+    this.type = "LuxeError" as const;
     this.code = _code;
     this.hint = _hint;
     this.name = this.constructor.name;
     Error.captureStackTrace(this, this.constructor);
     this.location = this.#extractErrorLocation();
     this.#extractCodeFrame().catch(() => {});
+  }
+
+  static is(error: unknown): error is LuxeError {
+    return (
+      error !== null &&
+      typeof error === "object" &&
+      "type" in error &&
+      error.type === "LuxeError"
+    );
   }
 
   /**

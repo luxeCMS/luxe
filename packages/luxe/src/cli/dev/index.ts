@@ -5,6 +5,7 @@ import { LuxeError } from "~/core/errors/index.js";
 export const dev = async (argv: ArgumentsCamelCase<object>) => {
   try {
     const config = await loadLuxeConfigFile();
+
     const modules = config.modules;
     const plugins = config.plugins;
 
@@ -18,7 +19,7 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
       console.log(`- ${plugin.name}`);
     }
   } catch (error) {
-    if (error instanceof LuxeError) {
+    if (LuxeError.is(error)) {
       console.error(error.toString());
     } else {
       console.error("An unknown error occurred");

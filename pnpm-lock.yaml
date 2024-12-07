@@ -76,6 +76,18 @@ importers:
         specifier: ^2.1.8
         version: 2.1.8(@types/node@20.17.9)
 
+  packages/luxe/test/fixtures/config-no-default-export: {}
+
+  packages/luxe/test/fixtures/config-not-found: {}
+
+  packages/luxe/test/fixtures/js-valid-config: {}
+
+  packages/luxe/test/fixtures/mjs-valid-config: {}
+
+  packages/luxe/test/fixtures/ts-invalid-config: {}
+
+  packages/luxe/test/fixtures/ts-valid-config: {}
+
   scripts:
     dependencies:
       '@types/glob':
