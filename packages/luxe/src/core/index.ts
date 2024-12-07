@@ -8,9 +8,9 @@ export const defineLuxeConfig = (
   try {
     return validateConfig(config);
   } catch (error) {
-    if (LuxeError.is(error)) {
+    if (LuxeError.isError(error)) {
       throw error;
     }
-    throw LuxeErrors.Config.FailedToParse;
+    throw LuxeErrors.Config.FailedToParse();
   }
 };

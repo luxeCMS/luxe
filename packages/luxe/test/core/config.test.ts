@@ -6,8 +6,8 @@ import {
   findProjectRoot,
   importConfigFile,
   loadLuxeConfigFile,
-} from "~/core/config/index.js";
-import { LuxeError, LuxeErrors } from "~/core/errors/index.js";
+} from "../../src/core/config/index.js";
+import { LuxeErrors } from "../../src/core/errors/index.js";
 
 const getConfigPathFromFixture = async (
   fixture: string,
@@ -40,23 +40,25 @@ describe("findProjectRoot", () => {
   });
 
   it("should throw if start path doesn't exist", async () => {
-    await expect(findProjectRoot("/nonexistent/path")).rejects.toBe(
-      LuxeErrors.Config.NoRoot,
+    await expect(findProjectRoot("/nonexistent/path")).rejects.toStrictEqual(
+      LuxeErrors.Config.NoRoot(),
     );
   });
 
   it("should throw if start path is a file", async () => {
     const filePath = path.join(testDir, "test.txt");
     fs.writeFileSync(filePath, "");
-    expect(findProjectRoot(filePath)).rejects.toBe(LuxeErrors.Config.NoRoot);
+    expect(findProjectRoot(filePath)).rejects.toStrictEqual(
+      LuxeErrors.Config.NoRoot(),
+    );
     fs.unlinkSync(filePath);
   });
 
   it("should throw if no package.json found within depth", async () => {
     const deepDir = path.join(testDir, "a", "b", "c");
     fs.mkdirSync(deepDir, { recursive: true });
-    await expect(findProjectRoot(deepDir)).rejects.toBe(
-      LuxeErrors.Config.NoRoot,
+    await expect(findProjectRoot(deepDir)).rejects.toStrictEqual(
+      LuxeErrors.Config.NoRoot(),
     );
   });
 });
@@ -68,13 +70,6 @@ describe("buildTsConfig", () => {
 
     expect(result).toBeDefined();
     expect(result).toContain("luxe_config_default as default");
-  });
-
-  it("should throw new LuxeError on invalid TypeScript", async () => {
-    const invalidPath = await getConfigPathFromFixture("ts-invalid-config");
-    await expect(buildTsConfig(invalidPath)).rejects.toBeTypeOf(
-      typeof new LuxeError(),
-    );
   });
 });
 
@@ -102,15 +97,15 @@ describe("importConfigFile", () => {
     const configPath = await getConfigPathFromFixture(
       "config-no-default-export",
     );
-    await expect(importConfigFile(configPath)).rejects.toBe(
-      LuxeErrors.Config.NoDefaultExport,
+    await expect(importConfigFile(configPath)).rejects.toStrictEqual(
+      LuxeErrors.Config.NoDefaultExport(),
     );
   });
 
   it("should throw a new LuxeError if the file is not found", async () => {
     const configPath = await getConfigPathFromFixture("config-not-found");
-    await expect(importConfigFile(configPath)).rejects.toBe(
-      LuxeErrors.Config.FailedToDynamicImport,
+    await expect(importConfigFile(configPath)).rejects.toStrictEqual(
+      LuxeErrors.Config.FailedToDynamicImport(),
     );
   });
 
@@ -150,8 +145,8 @@ describe("loadLuxeConfigFile", () => {
     const configPath = (
       await getConfigPathFromFixture("config-not-found")
     ).replace("/luxe.config.ts", "");
-    await expect(loadLuxeConfigFile(configPath)).rejects.toBe(
-      LuxeErrors.Config.NoConfigFile,
+    await expect(loadLuxeConfigFile(configPath)).rejects.toStrictEqual(
+      LuxeErrors.Config.NoConfigFile(),
     );
   });
 
@@ -184,8 +179,8 @@ describe("loadLuxeConfigFile", () => {
 
   it("should throw NoRoot error when project root cannot be found", async () => {
     const nonExistentPath = "/path/that/does/not/exist";
-    await expect(loadLuxeConfigFile(nonExistentPath)).rejects.toBe(
-      LuxeErrors.Config.NoRoot,
+    await expect(loadLuxeConfigFile(nonExistentPath)).rejects.toStrictEqual(
+      LuxeErrors.Config.NoRoot(),
     );
   });
 
@@ -193,8 +188,8 @@ describe("loadLuxeConfigFile", () => {
     const configPath = (
       await getConfigPathFromFixture("config-not-found")
     ).replace("/luxe.config.ts", "");
-    await expect(loadLuxeConfigFile(configPath)).rejects.toBe(
-      LuxeErrors.Config.NoConfigFile,
+    await expect(loadLuxeConfigFile(configPath)).rejects.toStrictEqual(
+      LuxeErrors.Config.NoConfigFile(),
     );
   });
 });

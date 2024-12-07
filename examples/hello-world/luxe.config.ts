@@ -6,6 +6,6 @@ const config = defineLuxeConfig({
       name: "HelloWorldModule",
     },
   ],
-  plugins: [],
+  plugins: {},
 });
 export default config;

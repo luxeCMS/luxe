@@ -19,7 +19,7 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
       console.log(`- ${plugin.name}`);
     }
   } catch (error) {
-    if (LuxeError.is(error)) {
+    if (LuxeError.isError(error)) {
       console.error(error.toString());
     } else {
       console.error("An unknown error occurred");

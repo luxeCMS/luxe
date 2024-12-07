@@ -31,10 +31,10 @@ export const findProjectRoot = async (startPath: string): Promise<string> => {
   try {
     const stats = await fs.stat(startPath);
     if (!stats.isDirectory()) {
-      throw LuxeErrors.Config.NoRoot;
+      throw LuxeErrors.Config.NoRoot();
     }
   } catch {
-    throw LuxeErrors.Config.NoRoot;
+    throw LuxeErrors.Config.NoRoot();
   }
 
   let currentPath = path.resolve(startPath);
@@ -54,7 +54,7 @@ export const findProjectRoot = async (startPath: string): Promise<string> => {
     }
   }
 
-  throw LuxeErrors.Config.NoRoot;
+  throw LuxeErrors.Config.NoRoot();
 };
 
 /**
@@ -78,7 +78,7 @@ export const buildTsConfig = async (configPath: string) => {
   });
 
   if (!result.outputFiles?.[0]) {
-    throw LuxeErrors.Config.FailedToBuildTs;
+    throw LuxeErrors.Config.FailedToBuildTs();
   }
 
   return result.outputFiles[0].text;
@@ -108,21 +108,21 @@ export const importConfigFile = async (
       const mod = await import(pathToFileURL(tmpFile).href);
       await fs.unlink(tmpFile);
       if (!mod.default) {
-        throw LuxeErrors.Config.NoDefaultExport;
+        throw LuxeErrors.Config.NoDefaultExport();
       }
       return mod.default;
     } catch (error) {
       await fs.unlink(tmpFile)?.catch(() => {});
-      if (LuxeError.is(error)) {
+      if (LuxeError.isError(error)) {
         throw error;
       }
-      throw LuxeErrors.Config.FailedToDynamicImport;
+      throw LuxeErrors.Config.FailedToDynamicImport();
     }
   }
 
   const mod = (await import(fileUrl)) as { default?: LuxeConfig };
   if (!mod.default) {
-    throw LuxeErrors.Config.NoDefaultExport;
+    throw LuxeErrors.Config.NoDefaultExport();
   }
   return mod.default;
 };
@@ -137,10 +137,10 @@ export const loadLuxeConfigFile = async (
   cwd = process.cwd(),
 ): Promise<LuxeConfig> => {
   const projectRoot = await findProjectRoot(cwd).catch((error) => {
-    if (LuxeError.is(error)) {
+    if (LuxeError.isError(error)) {
       throw error;
     }
-    throw LuxeErrors.Config.NoRoot;
+    throw LuxeErrors.Config.NoRoot();
   });
 
   const configFiles = ["luxe.config.ts", "luxe.config.js", "luxe.config.mjs"];
@@ -153,15 +153,15 @@ export const loadLuxeConfigFile = async (
       if (config) {
         return config;
       }
-      throw LuxeErrors.Config.NoConfigFile;
+      throw LuxeErrors.Config.NoConfigFile();
     } catch (error) {
-      if (LuxeError.is(error)) {
+      if (LuxeError.isError(error)) {
         throw error;
       }
     }
   }
 
-  throw LuxeErrors.Config.NoConfigFile;
+  throw LuxeErrors.Config.NoConfigFile();
 };
 
 /**
@@ -172,22 +172,22 @@ export const loadLuxeConfigFile = async (
  */
 export const validateConfig = (config: LuxeConfig): LuxeConfig => {
   if (!config) {
-    throw LuxeErrors.Config.Empty;
+    throw LuxeErrors.Config.Empty();
   }
   if (!Array.isArray(config.modules)) {
-    throw LuxeErrors.Config.PropertyNotArray("modules");
+    throw LuxeErrors.Config.PropertyNotArray("modules")();
   }
   if (!Array.isArray(config.plugins)) {
-    throw LuxeErrors.Config.PropertyNotArray("plugins");
+    throw LuxeErrors.Config.PropertyNotArray("plugins")();
   }
 
   let names = new Set<string>();
   for (const module of config.modules) {
     if (!module.name) {
-      throw LuxeErrors.Config.MissingRequiredProperty("module", "name");
+      throw LuxeErrors.Config.MissingRequiredProperty("module", "name")();
     }
     if (names.has(module.name)) {
-      throw LuxeErrors.Config.DuplicateTypeName("module", module.name);
+      throw LuxeErrors.Config.DuplicateTypeName("module", module.name)();
     }
     names.add(module.name);
   }
@@ -195,10 +195,10 @@ export const validateConfig = (config: LuxeConfig): LuxeConfig => {
   names = new Set<string>();
   for (const plugin of config.plugins) {
     if (!plugin.name) {
-      throw LuxeErrors.Config.MissingRequiredProperty("plugin", "name");
+      throw LuxeErrors.Config.MissingRequiredProperty("plugin", "name")();
     }
     if (names.has(plugin.name)) {
-      throw LuxeErrors.Config.DuplicateTypeName("plugin", plugin.name);
+      throw LuxeErrors.Config.DuplicateTypeName("plugin", plugin.name)();
     }
     names.add(plugin.name);
   }
