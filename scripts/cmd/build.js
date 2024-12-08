@@ -1,6 +1,7 @@
 import * as esbuild from "esbuild";
 import { glob } from "glob";
 import kleur from "kleur";
+import { x } from "tinyexec";
 
 async function build(...args) {
   const isDev = args.includes("IS_DEV");
@@ -45,7 +46,7 @@ async function build(...args) {
                   );
               });
 
-              build.onEnd((result) => {
+              build.onEnd(async (result) => {
                 if (result.errors.length > 0) {
                   log.error("Build failed");
                   for (const err of result.errors) {
@@ -53,6 +54,8 @@ async function build(...args) {
                   }
                   return;
                 }
+
+                await x("tsc", ["-p", "tsconfig.build.json"]);
 
                 log.success("Build completed");
 

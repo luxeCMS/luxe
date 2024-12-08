@@ -2,20 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { LuxeError, LuxeErrors } from "../errors/index.js";
-
-/**
- * The configuration object for a Luxe module.
- */
-interface LuxeCoreModuleConfig {
-  name: string;
-}
-
-/**
- * The configuration object for a Luxe plugin.
- */
-interface LuxeCorePluginConfig {
-  name: string;
-}
+import type { LuxeCoreModule } from "../modules/module.js";
+import type { LuxeCorePlugin } from "../plugins/plugin.js";
 
 /**
  * The Luxe configuration object.
@@ -23,8 +11,8 @@ interface LuxeCorePluginConfig {
  * This object is used to define the modules and plugins that should be loaded by Luxe.
  */
 export type LuxeConfig = {
-  modules: LuxeCoreModuleConfig[];
-  plugins: LuxeCorePluginConfig[];
+  modules: LuxeCoreModule[];
+  plugins: LuxeCorePlugin[];
 };
 
 /**

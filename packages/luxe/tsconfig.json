@@ -1,16 +1,10 @@
 {
-	"extends": "../../tsconfig.json",
-	"compilerOptions": {
-		"declaration": true,
-		"emitDeclarationOnly": true,
-		"outDir": "dist/types",
-		"jsx": "react-jsx",
-		"jsxImportSource": "hono/jsx",
-		"baseUrl": ".",
-		"paths": {
-			"~/*": ["./src/*"]
-		}
-	},
-	"include": ["src"],
-	"exclude": ["node_modules", "dist", "**/fixtures/**"]
+  "extends": "../../tsconfig.json",
+  "include": ["src"],
+  "compilerOptions": {
+    "allowJs": true,
+    "declarationDir": "./dist/types",
+    "outDir": "./dist/types",
+    "jsx": "preserve"
+  }
 }

@@ -1,6 +1,6 @@
 export {
   validateConfig,
-  LuxeConfig,
+  type LuxeConfig,
   buildTsConfig,
   findProjectRoot,
   importConfigFile,

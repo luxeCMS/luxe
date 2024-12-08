@@ -1,7 +1,7 @@
 import type { ArgumentsCamelCase } from "yargs";
-import { loadLuxeConfigFile, validateConfig } from "~/core/config/index.js";
-import { LuxeError } from "~/core/errors/index.js";
-import { LuxeLog } from "~/core/logger/index.js";
+import { loadLuxeConfigFile, validateConfig } from "../../core/config/index.js";
+import { LuxeError } from "../../core/errors/index.js";
+import { LuxeLog } from "../../core/logger/index.js";
 
 export const dev = async (argv: ArgumentsCamelCase<object>) => {
   const logger = LuxeLog.instance({

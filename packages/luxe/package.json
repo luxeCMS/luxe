@@ -1,44 +1,45 @@
 {
-	"name": "luxecms",
-	"version": "0.0.1",
-	"description": "The first modular CMS",
-	"type": "module",
-	"scripts": {
-		"dev": "luxe-scripts dev",
-		"build": "luxe-scripts build && tsc",
-		"test": "vitest"
-	},
-	"exports": {
-		".": {
-			"types": "./dist/types/index.d.ts",
-			"import": "./dist/esm/index.mjs",
-			"require": "./dist/cjs/index.cjs"
-		}
-	},
-	"bin": {
-		"luxe": "./dist/esm/luxe.mjs"
-	},
-	"devDependencies": {
-		"@types/node": "^20.11.17",
-		"@types/stack-utils": "^2.0.3",
-		"@types/yargs": "^17.0.33",
-		"@vitest/coverage-v8": "^2.1.8",
-		"luxe-scripts": "workspace:*",
-		"tsup": "^8.0.2",
-		"tsx": "^4.7.1",
-		"vitest": "^2.1.8"
-	},
-	"dependencies": {
-		"@clack/prompts": "^0.8.2",
-		"@hono/node-server": "^1.13.7",
-		"cosmiconfig": "^9.0.0",
-		"esbuild": "^0.24.0",
-		"hono": "^4.6.12",
-		"error-stack-parser": "^2.1.4",
-		"kleur": "^4.1.5",
-		"stack-trace": "1.0.0-pre2",
-		"stack-utils": "^2.0.6",
-		"yargs": "^17.7.2",
-		"zod": "^3.23.8"
-	}
+  "name": "luxecms",
+  "version": "0.0.1",
+  "description": "The first modular CMS",
+  "type": "module",
+  "scripts": {
+    "dev": "luxe-scripts dev",
+    "build:types": "tsc",
+    "build": "luxe-scripts build && pnpm run build:types",
+    "test": "vitest"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs"
+    }
+  },
+  "bin": {
+    "luxe": "./dist/esm/luxe.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@types/stack-utils": "^2.0.3",
+    "@types/yargs": "^17.0.33",
+    "@vitest/coverage-v8": "^2.1.8",
+    "luxe-scripts": "workspace:*",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.1",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.8.2",
+    "@hono/node-server": "^1.13.7",
+    "cosmiconfig": "^9.0.0",
+    "esbuild": "^0.24.0",
+    "hono": "^4.6.12",
+    "error-stack-parser": "^2.1.4",
+    "kleur": "^4.1.5",
+    "stack-trace": "1.0.0-pre2",
+    "stack-utils": "^2.0.6",
+    "yargs": "^17.7.2",
+    "zod": "^3.23.8"
+  }
 }

@@ -1,9 +1,14 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "NodeNext",
-		"strict": true,
-		"skipLibCheck": true,
-		"types": ["node"]
-	}
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "strict": true,
+    "moduleResolution": "Node16",
+    "target": "ES2022",
+    "module": "Node16",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "stripInternal": true
+  }
 }

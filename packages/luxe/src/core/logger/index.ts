@@ -1,4 +1,3 @@
-import type { WriteStream } from "node:fs";
 import { format } from "node:util";
 import kleur from "kleur";
 import { LuxeError } from "../errors/index.js";

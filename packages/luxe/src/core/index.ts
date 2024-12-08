@@ -1,6 +1,4 @@
-import { validateConfig } from "./config/index.js";
 import type { LuxeConfig } from "./config/index.js";
-import { LuxeError, LuxeErrors } from "./errors/index.js";
 
 /**
  * Define a new Luxe configuration object.
@@ -14,8 +12,8 @@ import { LuxeError, LuxeErrors } from "./errors/index.js";
  * @param config
  * @returns
  */
-export const defineLuxeConfig = (
-  config: LuxeConfig,
-): LuxeConfig | undefined => {
+export const defineLuxeConfig = <T extends LuxeConfig = LuxeConfig>(
+  config: T,
+): T => {
   return config;
 };
