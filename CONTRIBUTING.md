@@ -2,7 +2,8 @@
 
 We welcome contributions of any size and skill level. Even documentation fixes for typos. As a truly open source project, we aim to build together with our community and are happy to provide guidance for first-time contributors.
 
-> [!Tip] > **New to open source?** Check out [First Contributions](https://github.com/firstcontributions/first-contributions) for a beginner-friendly guide.
+> [!Tip]
+> **New to open source?** Check out [First Contributions](https://github.com/firstcontributions/first-contributions) for a beginner-friendly guide.
 
 ## Quick Start
 
