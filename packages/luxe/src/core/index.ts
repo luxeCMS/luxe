@@ -1,19 +1,31 @@
-import type { LuxeConfig } from "./config/index.js";
+import type { LuxeUserConfig } from "./config/types/config.js";
 
 /**
- * Define a new Luxe configuration object.
+ * Defines a type-safe configuration for Luxe
+ * @param config - The Luxe configuration object
+ * @returns A type-safe, readonly configuration object
+ * @public
  *
- * This function is used to define a new Luxe configuration object.
- * It adds additional features like type checking and validation.
- *
- * This is the recommended way to define a new Luxe configuration object
- * in your Luxe config file.
- *
- * @param config
- * @returns
+ * @example
+ * ```typescript
+ * const config = defineConfig({
+ *   modules: [{
+ *     name: 'core',
+ *     hooks: {
+ *       onInit: async () => {
+ *         console.log('Initializing core module');
+ *       }
+ *     }
+ *   }],
+ *   plugins: [{
+ *     id: 'my-plugin',
+ *     version: '1.0.0'
+ *   }]
+ * });
+ * ```
  */
-export const defineLuxeConfig = <T extends LuxeConfig = LuxeConfig>(
-  config: T,
-): T => {
+export function defineConfig(config: LuxeUserConfig): LuxeUserConfig {
   return config;
-};
+}
+
+export type { LuxeUserConfig };

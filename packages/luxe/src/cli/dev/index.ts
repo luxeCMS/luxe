@@ -13,29 +13,19 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
     // not all users will use the `defineLuxeConfig` function,
     // so we validate the config here.
     const validatedConfig = validateConfig(config);
+    logger.debug("Config loaded successfully");
 
-    const modules = validatedConfig.modules;
-    const plugins = validatedConfig.plugins;
-
-    console.log("\nModules:");
-    for (const module of modules) {
-      console.log(`- ${module.name}`);
-    }
-
-    console.log("\nPlugins:");
-    for (const plugin of plugins) {
-      console.log(`- ${plugin.name}`);
+    // Load the core modules
+    for (const module of validatedConfig.modules) {
+      if (module.hooks?.["luxe:module:start"]) {
+        await module.hooks["luxe:module:start"]({});
+      }
     }
   } catch (error) {
     if (LuxeError.isError(error)) {
       logger.error(error);
     } else {
-      logger.error(
-        new LuxeError({
-          message: (error as Error)?.message ?? "An unknown error occurred",
-          code: "UNKNOWN_ERROR",
-        }),
-      );
+      logger.error(error as Error);
     }
   }
 };

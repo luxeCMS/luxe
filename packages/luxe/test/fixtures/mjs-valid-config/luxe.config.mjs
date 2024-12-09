@@ -1,6 +1,6 @@
-import { defineLuxeConfig } from "../../../src/core";
+import { defineConfig } from "../../../src/core";
 
-export default defineLuxeConfig({
+export default defineConfig({
   modules: [
     {
       name: "HelloWorldModule",

@@ -1,10 +1,10 @@
 {
-  "extends": "../../tsconfig.json",
-  "include": ["src"],
-  "compilerOptions": {
-    "allowJs": true,
-    "declarationDir": "./dist/types",
-    "outDir": "./dist/types",
-    "jsx": "preserve"
-  }
+	"extends": "../../tsconfig.json",
+	"include": ["src"],
+	"compilerOptions": {
+		"allowJs": true,
+		"declarationDir": "./dist/types",
+		"outDir": "./dist/types",
+		"jsx": "preserve"
+	}
 }

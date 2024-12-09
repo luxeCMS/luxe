@@ -2,18 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { LuxeError, LuxeErrors } from "../errors/index.js";
-import type { LuxeCoreModule } from "../modules/module.js";
-import type { LuxeCorePlugin } from "../plugins/plugin.js";
-
-/**
- * The Luxe configuration object.
- *
- * This object is used to define the modules and plugins that should be loaded by Luxe.
- */
-export type LuxeConfig = {
-  modules: LuxeCoreModule[];
-  plugins: LuxeCorePlugin[];
-};
+import type { LuxeUserConfig } from "./types/config.js";
 
 /**
  * Find the root of the project by searching up for a package.json file.
@@ -90,7 +79,7 @@ export const buildTsConfig = async (configPath: string) => {
  */
 export const importConfigFile = async (
   configPath: string,
-): Promise<LuxeConfig | undefined> => {
+): Promise<LuxeUserConfig | undefined> => {
   const fileUrl = pathToFileURL(configPath).href;
   const ext = path.extname(configPath);
 
@@ -114,7 +103,7 @@ export const importConfigFile = async (
     }
   }
 
-  const mod = (await import(fileUrl)) as { default?: LuxeConfig };
+  const mod = (await import(fileUrl)) as { default?: LuxeUserConfig };
   if (!mod.default) {
     throw LuxeErrors.Config.NoDefaultExport();
   }
@@ -129,7 +118,7 @@ export const importConfigFile = async (
  */
 export const loadLuxeConfigFile = async (
   cwd = process.cwd(),
-): Promise<LuxeConfig> => {
+): Promise<LuxeUserConfig> => {
   const projectRoot = await findProjectRoot(cwd).catch((error) => {
     if (LuxeError.isError(error)) {
       throw error;
@@ -168,7 +157,7 @@ export const loadLuxeConfigFile = async (
  * @returns the validated configuration object
  * @throws {LuxeError} if the configuration object is invalid
  */
-export const validateConfig = (config: LuxeConfig): LuxeConfig => {
+export const validateConfig = (config: LuxeUserConfig): LuxeUserConfig => {
   if (!config) {
     throw LuxeErrors.Config.Empty();
   }

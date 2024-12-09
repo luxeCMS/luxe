@@ -1,4 +1,4 @@
-import { defineLuxeConfig } from "./core/index.js";
+import { type LuxeUserConfig, defineConfig } from "./core/index.js";
 
 /**
  * This file is used to export any public APIs that are available to the user
@@ -6,4 +6,4 @@ import { defineLuxeConfig } from "./core/index.js";
  * implementation details, only exports.
  */
 
-export { defineLuxeConfig };
+export { defineConfig, type LuxeUserConfig };

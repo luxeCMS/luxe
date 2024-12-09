@@ -1,6 +1,6 @@
-import { defineLuxeConfig } from "../../../src/core/index.js";
+import { defineConfig } from "../../../src/core/index.js";
 
-const config = defineLuxeConfig({
+const config = defineConfig({
   modules: [
     {
       name: "HelloWorldModule",
