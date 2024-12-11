@@ -15,7 +15,6 @@ export async function pingPostgres(
     await client.query("SELECT 1");
     return true;
   } catch (error) {
-    console.error("Failed to connect to PostgreSQL database.");
     return false;
   } finally {
     try {

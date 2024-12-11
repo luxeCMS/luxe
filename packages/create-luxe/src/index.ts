@@ -59,12 +59,9 @@ export const main = async () => {
   );
 
   const pingedDb = await pingPostgres(project.postgresUrl);
-  const s = p.spinner();
   if (!pingedDb) {
-    s.stop("Could not connect to the database.");
+    p.cancel("Could not connect to the database.");
     process.exit(1);
-  } else {
-    s.stop("Database connection successful.");
   }
 
   if (project.install) {
