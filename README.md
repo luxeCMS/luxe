@@ -2,6 +2,8 @@
 
 <div align="center">
 
+![LuxeCMS](./assets/luxe-logo-wide-bold.png)
+
 The first truly composable headless CMS built for the modular web.
 
 [![GitHub license](https://img.shields.io/github/license/luxeCMS/luxe)](https://github.com/luxeCMS/luxe/blob/main/LICENSE)
