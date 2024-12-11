@@ -4,8 +4,9 @@ import kleur from "kleur";
 import { x } from "tinyexec";
 
 async function build(...args) {
-  const isDev = args.includes("IS_DEV");
+  const isDev = args.includes("--dev");
   const isVerbose = args.includes("--verbose");
+  const dts = args.includes("--dts");
   const entryPoints = await glob(["src/**/index.ts", "src/**/luxe.ts"], {
     absolute: true,
   });
@@ -14,7 +15,7 @@ async function build(...args) {
     entryPoints,
     bundle: true,
     platform: "node",
-    target: "node18",
+    target: "node20",
     sourcemap: isDev,
     minify: !isDev,
     packages: "external",
@@ -25,7 +26,7 @@ async function build(...args) {
     success: (msg) => console.log(kleur.green().bold("✓ ") + msg),
     warn: (msg) => console.log(kleur.yellow().bold("⚠ ") + msg),
     error: (msg) => console.log(kleur.red().bold("✖ ") + msg),
-    verbose: (msg) => isVerbose && console.log(kleur.gray().dim("v ") + msg),
+    verbose: (msg) => isVerbose && console.log(kleur.gray().dim("% ") + msg),
   };
 
   try {
@@ -55,7 +56,10 @@ async function build(...args) {
                   return;
                 }
 
-                await x("tsc", ["-p", "tsconfig.build.json"]);
+                if (dts) {
+                  log.debug("Generating type definitions");
+                  await x("tsc", ["--emitDeclarationOnly", "--declaration"]);
+                }
 
                 log.success("Build completed");
 
@@ -79,8 +83,8 @@ async function build(...args) {
         ],
       });
 
-      await ctx.watch();
       log.info("Watching for changes...");
+      await ctx.watch();
 
       process.on("SIGTERM", () => ctx.dispose());
       process.on("SIGINT", () => ctx.dispose());
@@ -98,6 +102,12 @@ async function build(...args) {
           outdir: "dist/cjs",
           outExtension: { ".js": ".cjs" },
         }),
+        (async () => {
+          if (dts) {
+            log.info("Generating type definitions");
+            await x("tsc", ["--emitDeclarationOnly", "--declaration"]);
+          }
+        })(),
       ]);
       log.success("Build completed");
     }

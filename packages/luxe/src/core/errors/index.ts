@@ -378,5 +378,14 @@ export const LuxeErrors = {
       message: "Failed to parse configuration file",
       hint: "Do you happen to have a syntax error in your configuration file?",
     }),
+
+    /**
+     * Use this error when a configuration file has an invalid postgres URL.
+     */
+    InvalidPostgresUrl: LuxeError.create({
+      code: "INVALID_POSTGRES_URL",
+      message: "Invalid PostgreSQL URL",
+      hint: "Make sure the 'postgresUrl' property in your configuration file is a valid PostgreSQL URL.",
+    }),
   },
 } as const;
