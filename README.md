@@ -1,15 +1,13 @@
-# LuxeCMS
-
 <div align="center">
 
-![LuxeCMS](./assets/luxe-logo-wide-bold.png)
+![LuxeCMS](./assets/luxe-logo-github.webp)
 
 The first truly composable headless CMS built for the modular web.
 
 [![GitHub license](https://img.shields.io/github/license/luxeCMS/luxe)](https://github.com/luxeCMS/luxe/blob/main/LICENSE)
 [![Discord](https://img.shields.io/discord/123456789?label=Discord&logo=discord)](https://discord.gg/6XzN3e8VCk)
 
-> **Note:** LuxeCMS is under active development. Join our [Discord](https://discord.gg/6XzN3e8VCk) to stay updated on the first stable release.
+> **Note:** LuxeCMS is under active development and is not production-ready. Join our [Discord](https://discord.gg/6XzN3e8VCk) to stay updated on the first stable release.
 
 </div>
 
@@ -26,7 +24,15 @@ This project would not be possible without inspiration from [Astro](https://astr
 
 ## Quick Start
 
-TODO
+To get started with LuxeCMS, run the following command:
+
+```bash
+pnpm create luxe@lastest
+# or
+npm create luxe@lastest
+```
+
+Follow the steps in the CLI to create a new Luxe project.
 
 ## Contributing
 
