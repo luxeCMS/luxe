@@ -12,6 +12,11 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luxeCMS/luxe.git",
+    "directory": "packages/create-luxe"
+  },
   "scripts": {
     "dev": "luxe-scripts dev --dts",
     "build": "luxe-scripts build --dts"
@@ -30,5 +35,11 @@
     "@types/node": "^20.11.17",
     "@types/pg": "^8.11.10",
     "luxe-scripts": "workspace:*"
-  }
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT",
+  "homepage": "https://luxecms.dev",
+  "author": "LuxeCMS"
 }

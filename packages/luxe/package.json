@@ -1,7 +1,7 @@
 {
   "name": "luxecms",
   "version": "0.0.1",
-  "description": "The first modular CMS",
+  "description": "The first truly composable headless CMS built for the modular web.",
   "type": "module",
   "scripts": {
     "dev": "luxe-scripts dev --dts",

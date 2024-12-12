@@ -1,10 +1,12 @@
 {
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "dev": "turbo run dev --concurrency=40 --parallel",
     "test": "turbo run test --concurrency=40 --parallel",
     "format": "biome format --write .",
     "lint": "biome lint --write .",
-    "check": "biome check --write ."
+    "check": "biome check --write .",
+    "version": "changeset version"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

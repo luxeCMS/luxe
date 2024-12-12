@@ -1,3 +1,5 @@
 {
-  "type": "module"
+  "name": "@test/luxe-config-no-default-export",
+  "type": "module",
+  "private": true
 }
