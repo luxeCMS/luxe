@@ -1,5 +1,8 @@
 import { downloadTemplate } from "@bluwy/giget-core";
+import fs from "node:fs/promises";
+import path from "node:path";
 import pg from "pg";
+import { x } from "tinyexec";
 
 export async function pingPostgres(
   connectionString: string,
@@ -80,3 +83,23 @@ export async function downloadLuxeExample(
     return false;
   }
 }
+
+export const renamePackageName = async (destPath: string) => {
+  try {
+    // replace the name inside package.json with the last part of the path
+    const absolutePath = path.join(process.cwd(), destPath);
+    const fileContents = await fs.readFile(
+      `${absolutePath}/package.json`,
+      "utf8",
+    );
+    const packageJson = JSON.parse(fileContents);
+    packageJson.name = destPath.split("/").pop();
+    await fs.writeFile(
+      `${absolutePath}/package.json`,
+      JSON.stringify(packageJson, null, 2),
+    );
+    return true;
+  } catch {
+    return false;
+  }
+};

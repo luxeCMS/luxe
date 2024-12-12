@@ -13,6 +13,6 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "luxecms": "workspace:*"
+    "luxecms": "luxecms"
   }
 }
