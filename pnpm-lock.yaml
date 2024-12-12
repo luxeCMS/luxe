@@ -24,30 +24,6 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
 
-  examples/_test:
-    dependencies:
-      luxecms:
-        specifier: workspace:*
-        version: link:../minimal_ts
-
-  examples/hello-world:
-    dependencies:
-      luxecms:
-        specifier: workspace:*
-        version: link:../../packages/luxe
-
-  examples/minimal_js:
-    dependencies:
-      luxecms:
-        specifier: workspace:*
-        version: link:../minimal_ts
-
-  examples/minimal_ts:
-    dependencies:
-      luxecms:
-        specifier: workspace:*
-        version: 'link:'
-
   packages/create-luxe:
     dependencies:
       '@bluwy/giget-core':
