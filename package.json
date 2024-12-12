@@ -18,5 +18,8 @@
   "engines": {
     "node": ">=20.17.1"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "packageManager": "pnpm@9.12.0"
 }
