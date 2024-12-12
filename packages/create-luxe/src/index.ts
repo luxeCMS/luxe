@@ -1,6 +1,7 @@
 import * as p from "@clack/prompts";
 import color from "picocolors";
-import { pingPostgres } from "./utils.js";
+import { pingPostgres, readLuxeGithubExamplesDir } from "./utils.js";
+import { x } from "tinyexec";
 
 export const main = async () => {
   console.clear();
@@ -23,6 +24,23 @@ export const main = async () => {
             }
           },
         }),
+      example: async () => {
+        const s = p.spinner();
+        s.start("Loading templates");
+        const examples = await readLuxeGithubExamplesDir();
+        if (examples.length === 0) {
+          s.stop();
+          p.cancel(
+            "Failed to fetch templates. Are you connected to the internet?",
+          );
+          process.exit(0);
+        }
+        s.stop("Loaded templates");
+        return p.select({
+          message: "Which template would you like to use?",
+          options: examples.map((e) => ({ value: e.name, label: e.label })),
+        });
+      },
       postgresUrl: () =>
         p.text({
           message: "What PostgreSQL database should we connect to?",
@@ -39,11 +57,6 @@ export const main = async () => {
             }
           },
         }),
-      type: () =>
-        p.confirm({
-          message: "Would you like to use TypeScript?",
-          initialValue: true,
-        }),
       install: () =>
         p.confirm({
           message: "Install dependencies?",
@@ -59,16 +72,21 @@ export const main = async () => {
   );
 
   const pingedDb = await pingPostgres(project.postgresUrl);
+  const s = p.spinner();
+  s.start("Pinging the database...");
   if (!pingedDb) {
-    p.cancel("Could not connect to the database.");
+    s.stop("Could not connect to the database.");
+    p.cancel("Operation cancelled.");
     process.exit(1);
   }
+  s.stop("Pinged database successfully.");
 
   if (project.install) {
     const s = p.spinner();
     s.start("Installing dependencies...");
-
-    s.stop("Installed via pnpm");
+    // TODO: auto detect what package manager the developer is using
+    await x("npm", ["install"]);
+    s.stop("Installed via npm");
   }
 
   const nextSteps = `cd ${project.path}        \n${
@@ -77,7 +95,5 @@ export const main = async () => {
 
   p.note(nextSteps, "Next steps.");
 
-  p.outro(
-    `Problems? ${color.underline(color.cyan("https://example.com/issues"))}`,
-  );
+  p.outro("Have fun building with LuxeCMS! 🎉");
 };

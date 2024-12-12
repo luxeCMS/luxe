@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "luxe-scripts dev --dts",
-    "build:types": "tsc",
-    "build": "luxe-scripts build && pnpm run build:types",
+    "build": "luxe-scripts build --dts",
     "test": "vitest"
   },
   "exports": {
