@@ -1,4 +1,6 @@
 {
+  "name": "root",
+  "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "turbo run dev --concurrency=40 --parallel",
