@@ -3,6 +3,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { LuxeError, LuxeErrors } from "../errors/index.js";
 import type { LuxeUserConfig } from "./types/config.js";
+import { configSchema } from "./zod/config-schema.js";
 
 /**
  * Find the root of the project by searching up for a package.json file.
@@ -158,37 +159,28 @@ export const loadLuxeConfigFile = async (
  * @throws {LuxeError} if the configuration object is invalid
  */
 export const validateConfig = (config: LuxeUserConfig): LuxeUserConfig => {
-  if (!config) {
+  const validatedConfig = configSchema.parse(config);
+
+  if (!validatedConfig) {
+    // TODO: Use a different error here
     throw LuxeErrors.Config.Empty();
   }
-  if (!Array.isArray(config.modules)) {
-    throw LuxeErrors.Config.PropertyNotArray("modules")();
-  }
-  if (!Array.isArray(config.plugins)) {
-    throw LuxeErrors.Config.PropertyNotArray("plugins")();
-  }
 
-  let names = new Set<string>();
-  for (const module of config.modules) {
-    if (!module.name) {
-      throw LuxeErrors.Config.MissingRequiredProperty("module", "name")();
-    }
-    if (names.has(module.name)) {
+  const moduleNames = new Set<string>();
+  for (const module of validatedConfig?.modules ?? []) {
+    if (moduleNames.has(module.name)) {
       throw LuxeErrors.Config.DuplicateTypeName("module", module.name)();
     }
-    names.add(module.name);
+    moduleNames.add(module.name);
   }
 
-  names = new Set<string>();
-  for (const plugin of config.plugins) {
-    if (!plugin.name) {
-      throw LuxeErrors.Config.MissingRequiredProperty("plugin", "name")();
-    }
-    if (names.has(plugin.name)) {
+  const pluginNames = new Set<string>();
+  for (const plugin of validatedConfig?.plugins ?? []) {
+    if (pluginNames.has(plugin.name)) {
       throw LuxeErrors.Config.DuplicateTypeName("plugin", plugin.name)();
     }
-    names.add(plugin.name);
+    pluginNames.add(plugin.name);
   }
 
-  return config;
+  return validatedConfig;
 };

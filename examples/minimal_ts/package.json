@@ -1,0 +1,18 @@
+{
+  "name": "luxecms",
+  "version": "1.0.0",
+  "description": "A minimal LuxeCMS project",
+  "type": "module",
+  "scripts": {
+    "dev": "luxe dev"
+  },
+  "keywords": [
+    "hello",
+    "world"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "luxecms": "luxecms"
+  }
+}

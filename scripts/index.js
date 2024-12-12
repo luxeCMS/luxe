@@ -5,7 +5,7 @@ export default async function run() {
     case "dev":
     case "build": {
       const { default: build } = await import("./cmd/build.js");
-      await build(...args, cmd === "dev" ? "IS_DEV" : undefined);
+      await build(...args, cmd === "dev" ? "--dev" : undefined);
       break;
     }
     default: {

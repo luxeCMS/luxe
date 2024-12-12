@@ -1,0 +1,34 @@
+{
+  "name": "create-luxe",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./create-luxe.mjs",
+  "exports": {
+    ".": "./create-luxe.mjs"
+  },
+  "bin": {
+    "create-luxe": "./create-luxe.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "luxe-scripts dev --dts",
+    "build": "luxe-scripts build --dts"
+  },
+  "dependencies": {
+    "@bluwy/giget-core": "^0.1.2",
+    "@clack/core": "^0.3.5",
+    "@clack/prompts": "^0.8.2",
+    "is-unicode-supported": "^2.1.0",
+    "pg": "^8.13.1",
+    "picocolors": "^1.1.1",
+    "sisteransi": "^1.0.5",
+    "tinyexec": "^0.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@types/pg": "^8.11.10",
+    "luxe-scripts": "workspace:*"
+  }
+}

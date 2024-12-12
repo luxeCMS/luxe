@@ -9,8 +9,8 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
   });
   try {
     const config = await loadLuxeConfigFile();
-    // We don't validate inside the `defineLuxeConfig` function because
-    // not all users will use the `defineLuxeConfig` function,
+    // We don't validate inside the `defineConfig` function because
+    // not all users will use the `defineConfig` function,
     // so we validate the config here.
     const validatedConfig = validateConfig(config);
     logger.debug("Config loaded successfully");
