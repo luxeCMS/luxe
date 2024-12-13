@@ -133,3 +133,17 @@ export const setupEnvFile = async (
     return false;
   }
 };
+
+export const installDependencies = async (projectPath: string) => {
+  const absolutePath = path.join(process.cwd(), projectPath);
+  try {
+    // TODO: auto detect what package manager the developer is using
+    const result = await x("npm", ["install", "--prefix", absolutePath]);
+    if (result.exitCode !== 0) {
+      throw new Error("Failed to install dependencies");
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
