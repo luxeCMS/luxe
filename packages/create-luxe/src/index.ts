@@ -5,6 +5,7 @@ import {
   pingPostgres,
   readLuxeGithubExamplesDir,
   renamePackageName,
+  setupEnvFile,
 } from "./utils.js";
 import { x } from "tinyexec";
 import path from "node:path";
@@ -103,28 +104,11 @@ export const main = async () => {
   }
 
   s.start("Creating .env file");
-  try {
-    const envPath = path.join(process.cwd(), project.path, ".env");
-    const newEnvContent = `DATABASE_URL=${project.postgresUrl}`;
-    const envExamplePath = path.join(
-      process.cwd(),
-      project.path,
-      ".env.example",
-    );
-    try {
-      const envContents = await fs.readFile(envExamplePath, "utf8");
-      const newEnvContents = envContents.replace(
-        /DATABASE_URL=postgres:\/\/[^@\s]+@[^\/\s]+\/\w+/,
-        newEnvContent,
-      );
-      await fs.writeFile(envPath, newEnvContents);
-    } catch {
-      // If the .env.example file doesn't exist, create a new one
-      await fs.writeFile(envPath, newEnvContent);
-    }
-    s.stop("Created .env file");
-  } catch (error) {
+  const envSetup = await setupEnvFile(project.path, project.postgresUrl);
+  if (!envSetup) {
     s.stop("Failed to create .env file");
+  } else {
+    s.stop("Created .env file");
   }
 
   const ctx = {
