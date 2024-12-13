@@ -1,20 +1,16 @@
 {
-  "name": "luxecms",
-  "private": true,
-  "version": "1.0.0",
-  "description": "A minimal LuxeCMS project",
-  "type": "module",
-  "scripts": {
-    "dev": "luxe dev"
-  },
-  "keywords": [
-    "cms",
-    "luxe",
-    "luxecms"
-  ],
-  "author": "Your Name",
-  "license": "MIT",
-  "dependencies": {
-    "luxecms": "^0.0.1"
-  }
+	"name": "luxecms",
+	"private": true,
+	"version": "1.0.0",
+	"description": "A minimal LuxeCMS project",
+	"type": "module",
+	"scripts": {
+		"dev": "luxe dev"
+	},
+	"keywords": ["cms", "luxe", "luxecms"],
+	"author": "Your Name",
+	"license": "MIT",
+	"dependencies": {
+		"luxecms": "^0.0.1"
+	}
 }
