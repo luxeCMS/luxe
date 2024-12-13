@@ -175,35 +175,40 @@ jobs:
       - name: Create GitHub Releases
         run: |
           create_release() {
-            local PKG_PATH=$1
+            local PKG_PATH="$1"
             local PKG_JSON="${PKG_PATH}/package.json"
             
-            if [[ ! -f "$PKG_JSON" ]]; then
+            if [ ! -f "$PKG_JSON" ]; then
               echo "Error: package.json not found at $PKG_JSON"
               return 1
-            }
+            fi
             
-            local PKG_NAME PKG_VERSION
+            local PKG_NAME
+            local PKG_VERSION
             PKG_NAME=$(node -p "require('./${PKG_JSON}').name" 2>/dev/null)
             PKG_VERSION=$(node -p "require('./${PKG_JSON}').version" 2>/dev/null)
             
-            if [[ -z "$PKG_NAME" || -z "$PKG_VERSION" ]]; then
+            if [ -z "$PKG_NAME" ] || [ -z "$PKG_VERSION" ]; then
               echo "Error: Failed to extract package name or version"
               return 1
-            }
+            fi
             
             local RELEASE_TAG="${{ steps.release_type.outputs.tag }}"
             local RELEASE_NAME="${PKG_NAME}@${PKG_VERSION}"
-            [[ "$RELEASE_TAG" != "latest" ]] && RELEASE_NAME="${RELEASE_NAME}-${RELEASE_TAG}"
+            if [ "$RELEASE_TAG" != "latest" ]; then
+              RELEASE_NAME="${RELEASE_NAME}-${RELEASE_TAG}"
+            fi
             
             local PRERELEASE=""
-            [[ "${{ steps.release_type.outputs.is_prerelease }}" == "true" ]] && PRERELEASE="--prerelease"
+            if [ "${{ steps.release_type.outputs.is_prerelease }}" = "true" ]; then
+              PRERELEASE="--prerelease"
+            fi
             
             echo "Creating release: $RELEASE_NAME"
             
             local max_attempts=3
             local attempt=1
-            while (( attempt <= max_attempts )); do
+            while [ $attempt -le $max_attempts ]; do
               if gh release create "$RELEASE_NAME" \
                 --title "$RELEASE_NAME" \
                 --notes "See CHANGELOG.md for details" \
@@ -213,7 +218,7 @@ jobs:
               
               echo "Attempt $attempt failed. Retrying in 5 seconds..."
               sleep 5
-              ((attempt++))
+              attempt=$((attempt + 1))
             done
             
             return 1
@@ -223,7 +228,7 @@ jobs:
           FAILED_PACKAGES=()
 
           for pkg in packages/*/; do
-            if [[ -f "${pkg}package.json" ]]; then
+            if [ -f "${pkg}package.json" ]; then
               echo "Processing ${pkg}..."
               if ! create_release "$pkg"; then
                 FAILED_PACKAGES+=("$pkg")
@@ -231,7 +236,7 @@ jobs:
             fi
           done
 
-          if (( ${#FAILED_PACKAGES[@]} > 0 )); then
+          if [ ${#FAILED_PACKAGES[@]} -gt 0 ]; then
             echo "Failed to create releases for:"
             printf '%s\n' "${FAILED_PACKAGES[@]}"
             exit 1
