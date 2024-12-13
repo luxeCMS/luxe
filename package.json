@@ -4,6 +4,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "turbo run dev --concurrency=40 --parallel",
+    "build": "turbo run build --concurrency=40",
     "test": "turbo run test --concurrency=40 --parallel",
     "format": "biome format --write .",
     "lint": "biome lint --write .",
