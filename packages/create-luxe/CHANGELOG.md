@@ -1,5 +1,13 @@
 # create-luxe
 
+## 0.0.3
+
+### Patch Changes
+
+- [#13](https://github.com/luxeCMS/luxe/pull/13) [`9556c8c`](https://github.com/luxeCMS/luxe/commit/9556c8c1dcec28b0cdbfab0614330113b65e1668) Thanks [@RATIU5](https://github.com/RATIU5)! - Fixed bug where the Postgres url was not copied over into the env file in the create-luxe cli
+
+- [#13](https://github.com/luxeCMS/luxe/pull/13) [`9556c8c`](https://github.com/luxeCMS/luxe/commit/9556c8c1dcec28b0cdbfab0614330113b65e1668) Thanks [@RATIU5](https://github.com/RATIU5)! - Fixed bug where create-luxe cli would fail to install packages
+
 ## 0.0.2
 
 ### Patch Changes
