@@ -1,163 +1,102 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    types: [opened, synchronize, reopened, labeled]
+    types: [closed]
     branches:
       - main
-  workflow_dispatch:
+
+env:
+  NODE_VERSION: 20
+  PNPM_VERSION: 9
+
+# Concurrency group to ensure only one release workflow runs at a time
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  validate:
-    name: Validate Changes
+  release:
+    name: Release
+    # Only run if PR was merged and has a release label
+    if: |
+      github.event.pull_request.merged == true &&
+      (contains(github.event.pull_request.labels.*.name, 'release:preview') ||
+       contains(github.event.pull_request.labels.*.name, 'release:alpha') ||
+       contains(github.event.pull_request.labels.*.name, 'release:beta') ||
+       contains(github.event.pull_request.labels.*.name, 'release:stable'))
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write # Needed for NPM provenance
+
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
+          ref: main # Explicitly checkout main since we're triggered on PR
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
         with:
-          version: 9
-          run_install: false
+          version: ${{ env.PNPM_VERSION }}
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Type Check
-        run: pnpm run type-check
 
       - name: Run Tests
         run: pnpm run test
 
-      - name: Lint
-        run: pnpm run lint
+      - name: Lint and Format
+        run: pnpm run check
 
-  release:
-    name: Release
-    needs: validate
-    if: |
-      github.event_name == 'push' && 
-      github.ref == 'refs/heads/main' && 
-      (contains(github.event.head_commit.message, 'Merge pull request') || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 9
-          run_install: false
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      # Get PR number from merge commit message
-      - name: Get PR Details
-        id: pr_details
-        run: |
-          PR_NUMBER=$(git log -1 --pretty=%B | grep -o '#[0-9]\+' | grep -o '[0-9]\+' || echo '')
-          if [ -z "$PR_NUMBER" ]; then
-            echo "No PR number found in commit message"
-            exit 0
-          fi
-          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-
-      # Get PR labels
-      - name: Get PR Labels
-        id: pr_labels
-        if: steps.pr_details.outputs.pr_number != ''
-        run: |
-          LABELS=$(gh pr view ${{ steps.pr_details.outputs.pr_number }} --json labels -q '.labels[].name' 2>/dev/null || echo '')
-          if [ -z "$LABELS" ]; then
-            echo "No labels found"
-            exit 0
-          fi
-          echo "labels=$LABELS" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-
-      # Determine release type from labels
       - name: Set Release Type
         id: release_type
-        if: steps.pr_labels.outputs.labels != ''
         run: |
-          LABELS="${{ steps.pr_labels.outputs.labels }}"
-          if echo "$LABELS" | grep -q "release:preview"; then
-            echo "type=preview" >> $GITHUB_OUTPUT
-            echo "tag=preview" >> $GITHUB_OUTPUT
-            echo "npm_tag=preview" >> $GITHUB_OUTPUT
-          elif echo "$LABELS" | grep -q "release:alpha"; then
-            echo "type=alpha" >> $GITHUB_OUTPUT
-            echo "tag=alpha" >> $GITHUB_OUTPUT
-            echo "npm_tag=alpha" >> $GITHUB_OUTPUT
-          elif echo "$LABELS" | grep -q "release:beta"; then
-            echo "type=beta" >> $GITHUB_OUTPUT
-            echo "tag=beta" >> $GITHUB_OUTPUT
-            echo "npm_tag=beta" >> $GITHUB_OUTPUT
-          elif echo "$LABELS" | grep -q "release:stable"; then
-            echo "type=stable" >> $GITHUB_OUTPUT
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "npm_tag=latest" >> $GITHUB_OUTPUT
+          LABELS="${{ toJSON(github.event.pull_request.labels.*.name) }}"
+          if [[ $LABELS =~ release:(preview|alpha|beta|stable) ]]; then
+            RELEASE_TYPE=$(echo $LABELS | grep -o 'release:\(preview\|alpha\|beta\|stable\)' | head -n1 | cut -d: -f2)
+            echo "Found release type: $RELEASE_TYPE"
+            
+            case $RELEASE_TYPE in
+              preview|alpha|beta)
+                echo "type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+                echo "tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+                echo "npm_tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+                ;;
+              stable)
+                echo "type=stable" >> $GITHUB_OUTPUT
+                echo "tag=latest" >> $GITHUB_OUTPUT
+                echo "npm_tag=latest" >> $GITHUB_OUTPUT
+                ;;
+              *)
+                echo "Invalid release type: $RELEASE_TYPE"
+                exit 1
+                ;;
+            esac
           else
-            echo "No release label found"
-            exit 0
+            echo "No valid release label found"
+            exit 1
           fi
 
-      # Build packages before publishing
       - name: Build Packages
-        run: pnpm run build
+        run: |
+          if ! pnpm run build; then
+            echo "Build failed"
+            exit 1
+          fi
 
-      # Create Release PR or Publish
       - name: Create Release Pull Request or Publish
-        if: steps.release_type.outputs.type != ''
         id: changesets
         uses: changesets/action@v1
         with:
@@ -169,48 +108,83 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+          NODE_ENV: production
 
-      # Create GitHub Releases for each changed package
       - name: Create GitHub Releases
         if: steps.changesets.outputs.published == 'true'
         run: |
-          # Function to create release for a package
           create_release() {
             local PKG_PATH=$1
             local PKG_JSON="${PKG_PATH}/package.json"
             
-            local PKG_NAME=$(node -p "require('./${PKG_JSON}').name")
-            local PKG_VERSION=$(node -p "require('./${PKG_JSON}').version")
-            local RELEASE_TAG="${{ steps.release_type.outputs.tag }}"
-            
-            # Add pre-release flag for non-stable releases
-            local PRERELEASE=""
-            if [ "$RELEASE_TAG" != "latest" ]; then
-              PRERELEASE="--prerelease"
-            fi
-            
-            echo "Creating release for ${PKG_NAME}@${PKG_VERSION}"
-            
-            # Create the release
-            if ! gh release create "${PKG_NAME}@v${PKG_VERSION}-${RELEASE_TAG}" \
-              --title "${PKG_NAME}@v${PKG_VERSION}-${RELEASE_TAG}" \
-              --notes "See CHANGELOG.md for details" \
-              $PRERELEASE; then
-              echo "Failed to create release for ${PKG_NAME}"
+            # Verify package.json exists
+            if [[ ! -f "$PKG_JSON" ]]; then
+              echo "Error: package.json not found at $PKG_JSON"
               return 1
-            fi
+            }
+            
+            # Extract package details with error checking
+            local PKG_NAME PKG_VERSION
+            PKG_NAME=$(node -p "require('./${PKG_JSON}').name" 2>/dev/null)
+            PKG_VERSION=$(node -p "require('./${PKG_JSON}').version" 2>/dev/null)
+            
+            if [[ -z "$PKG_NAME" || -z "$PKG_VERSION" ]]; then
+              echo "Error: Failed to extract package name or version from $PKG_JSON"
+              return 1
+            }
+            
+            local RELEASE_TAG="${{ steps.release_type.outputs.tag }}"
+            local RELEASE_NAME="${PKG_NAME}@v${PKG_VERSION}"
+            [[ "$RELEASE_TAG" != "latest" ]] && RELEASE_NAME="${RELEASE_NAME}-${RELEASE_TAG}"
+            
+            local PRERELEASE=""
+            [[ "$RELEASE_TAG" != "latest" ]] && PRERELEASE="--prerelease"
+            
+            echo "Creating release: $RELEASE_NAME"
+            
+            # Attempt to create release with retry logic
+            local max_attempts=3
+            local attempt=1
+            while (( attempt <= max_attempts )); do
+              if gh release create "$RELEASE_NAME" \
+                --title "$RELEASE_NAME" \
+                --notes "See CHANGELOG.md for details" \
+                $PRERELEASE; then
+                return 0
+              fi
+              
+              echo "Attempt $attempt failed. Retrying in 5 seconds..."
+              sleep 5
+              ((attempt++))
+            done
+            
+            echo "Failed to create release after $max_attempts attempts"
+            return 1
           }
 
           # Process each package
           echo "Looking for changed packages..."
+          FAILED_PACKAGES=()
+
           for pkg in packages/*/; do
-            if [ -f "${pkg}package.json" ]; then
+            if [[ -f "${pkg}package.json" ]]; then
               echo "Processing ${pkg}..."
               if ! create_release "$pkg"; then
-                echo "Failed to process ${pkg}"
-                exit 1
+                FAILED_PACKAGES+=("$pkg")
               fi
             fi
           done
+
+          if (( ${#FAILED_PACKAGES[@]} > 0 )); then
+            echo "Failed to create releases for the following packages:"
+            printf '%s\n' "${FAILED_PACKAGES[@]}"
+            exit 1
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+
+      - name: Handle Failure
+        if: failure()
+        run: |
+          echo "::error::Release workflow failed. Please check the logs for details."
+          # Could add additional failure handling here, like notifications
