@@ -88,13 +88,11 @@ jobs:
             preview|alpha|beta)
               echo "type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
               echo "tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
-              echo "npm_tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
               echo "is_prerelease=true" >> $GITHUB_OUTPUT
               ;;
             stable)
               echo "type=stable" >> $GITHUB_OUTPUT
               echo "tag=latest" >> $GITHUB_OUTPUT
-              echo "npm_tag=latest" >> $GITHUB_OUTPUT
               echo "is_prerelease=false" >> $GITHUB_OUTPUT
               ;;
             *)
@@ -113,14 +111,17 @@ jobs:
 
       - name: Configure Prerelease Mode
         if: steps.release_type.outputs.is_prerelease == 'true'
-        run: pnpm changeset pre enter ${{ steps.release_type.outputs.tag }}
+        run: |
+          # Exit pre mode first in case we're already in it
+          pnpm changeset pre exit || true
+          pnpm changeset pre enter ${{ steps.release_type.outputs.tag }}
 
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
         with:
           version: pnpm run version
-          publish: pnpm changeset publish --tag ${{ steps.release_type.outputs.npm_tag }}
+          publish: pnpm changeset publish
           commit: "chore: update versions and changelog"
           title: "chore: update versions and changelog"
         env:
