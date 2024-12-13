@@ -148,7 +148,7 @@ jobs:
 
       - name: Publish Packages
         run: |
-        # Verify npm authentication
+          # Verify npm authentication
           echo "Verifying npm authentication..."
           if ! npm whoami; then
             echo "NPM authentication failed"
@@ -163,7 +163,7 @@ jobs:
               npm access list packages "$PKG_NAME" || true
             fi
           done
-          
+
           # Try to publish with --access public flag first (for new packages)
           if ! pnpm changeset publish --access public; then
             echo "First publish attempt failed, trying without --access public flag"
