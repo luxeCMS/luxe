@@ -103,3 +103,33 @@ export const renamePackageName = async (destPath: string) => {
     return false;
   }
 };
+
+export const setupEnvFile = async (
+  projectPath: string,
+  postgresUrl: string,
+) => {
+  const envPath = path.join(process.cwd(), projectPath, ".env");
+  const newEnvContent = `POSTGRES_URL=${postgresUrl}`;
+  const envExamplePath = path.join(process.cwd(), projectPath, ".env.example");
+  try {
+    let envContents: string;
+    try {
+      envContents = await fs.readFile(envExamplePath, "utf8");
+    } catch {
+      envContents = "";
+    }
+    let newContents: string;
+    try {
+      newContents = envContents.replace(
+        /POSTGRES_URL=postgres:\/\/[^@\s]+@[^\/\s]+\/\w+/,
+        newEnvContent,
+      );
+    } catch {
+      newContents = newEnvContent;
+    }
+    await fs.writeFile(envPath, newContents);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
