@@ -8,8 +8,7 @@
     "test": "turbo run test --concurrency=40 --parallel",
     "format": "biome format --write .",
     "lint": "biome lint --write .",
-    "check": "biome check --write .",
-    "publish": "changeset publish"
+    "check": "biome check --write ."
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
