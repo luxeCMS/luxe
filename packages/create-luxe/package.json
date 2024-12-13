@@ -36,6 +36,9 @@
     "@types/pg": "^8.11.10",
     "luxe-scripts": "workspace:*"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=20.0.0"
   },
