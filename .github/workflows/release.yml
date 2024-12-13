@@ -147,8 +147,15 @@ jobs:
 
       - name: Publish Packages
         run: |
-          echo "Publishing packages..."
-          pnpm run publish
+          # Try to publish with --access public flag first (for new packages)
+          if ! pnpm changeset publish --access public; then
+            echo "First publish attempt failed, trying without --access public flag"
+            # If that fails, try normal publish (for existing packages)
+            if ! pnpm changeset publish; then
+              echo "Publishing failed"
+              exit 1
+            fi
+          fi
         env:
           NPM_CONFIG_PROVENANCE: true
           NODE_ENV: production
