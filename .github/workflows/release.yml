@@ -104,11 +104,7 @@ jobs:
           esac
 
       - name: Build Packages
-        run: |
-          if ! pnpm run build; then
-            echo "Build failed"
-            exit 1
-          fi
+        run: pnpm run build
 
       - name: Configure Git User
         run: |
@@ -117,60 +113,20 @@ jobs:
 
       - name: Configure Prerelease Mode
         if: steps.release_type.outputs.is_prerelease == 'true'
-        run: |
-          echo "Entering prerelease mode for ${{ steps.release_type.outputs.tag }}"
-          pnpm changeset pre enter ${{ steps.release_type.outputs.tag }}
+        run: pnpm changeset pre enter ${{ steps.release_type.outputs.tag }}
 
-      - name: Version Packages
-        run: |
-          pnpm changeset version -y
-
-      - name: Update Changelog
-        run: |
-          if [ -f "CHANGELOG.md" ]; then
-            echo "Updating CHANGELOG.md"
-            git add CHANGELOG.md
-          fi
-          git add .changeset/*.md || true
-          git add "**/CHANGELOG.md" || true
-          git add "**/package.json"
-
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: update versions and changelog"
-          fi
-
-      - name: Publish Packages
-        run: |
-          # Configure NPM authentication
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "access=public" >> .npmrc
-
-          # Verify the token works
-          if ! npm whoami --registry https://registry.npmjs.org/; then
-            echo "NPM authentication failed. Please check your NPM_TOKEN."
-            exit 1
-          fi
-
-          # Try to publish with --access public flag first (for new packages)
-          if ! pnpm changeset publish --access public; then
-            echo "First publish attempt failed, trying without --access public flag"
-            # If that fails, try normal publish (for existing packages)
-            if ! pnpm changeset publish; then
-              echo "Publishing failed"
-              exit 1
-            fi
-          fi
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: pnpm run version
+          publish: pnpm changeset publish --tag ${{ steps.release_type.outputs.npm_tag }}
+          commit: "chore: update versions and changelog"
+          title: "chore: update versions and changelog"
         env:
-          NPM_CONFIG_PROVENANCE: true
-          NODE_ENV: production
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Push Changes
-        run: |
-          git push origin main
-          git push origin --tags
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Create GitHub Releases
         run: |
@@ -179,18 +135,20 @@ jobs:
             local PKG_JSON="${PKG_PATH}/package.json"
             
             if [ ! -f "$PKG_JSON" ]; then
-              echo "Error: package.json not found at $PKG_JSON"
-              return 1
+              return 0  # Skip if package.json doesn't exist
             fi
             
             local PKG_NAME
             local PKG_VERSION
+            local PREV_VERSION
             PKG_NAME=$(node -p "require('./${PKG_JSON}').name" 2>/dev/null)
             PKG_VERSION=$(node -p "require('./${PKG_JSON}').version" 2>/dev/null)
+            PREV_VERSION=$(git show HEAD^:${PKG_JSON} 2>/dev/null | node -p "JSON.parse(require('fs').readFileSync(0)).version" 2>/dev/null || echo "")
             
-            if [ -z "$PKG_NAME" ] || [ -z "$PKG_VERSION" ]; then
-              echo "Error: Failed to extract package name or version"
-              return 1
+            # Skip if version hasn't changed
+            if [ "$PKG_VERSION" = "$PREV_VERSION" ]; then
+              echo "Skipping ${PKG_NAME} - version unchanged"
+              return 0
             fi
             
             local RELEASE_TAG="${{ steps.release_type.outputs.tag }}"
