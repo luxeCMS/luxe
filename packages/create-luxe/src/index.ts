@@ -2,6 +2,7 @@ import * as p from "@clack/prompts";
 import color from "picocolors";
 import {
   downloadLuxeExample,
+  installDependencies,
   pingPostgres,
   readLuxeGithubExamplesDir,
   renamePackageName,
@@ -117,18 +118,11 @@ export const main = async () => {
   if (project.install) {
     const s = p.spinner();
     s.start("Installing dependencies");
-    const absolutePath = path.join(process.cwd(), project.path);
-    try {
-      await x("cd", [absolutePath]);
-      // TODO: auto detect what package manager the developer is using
-      const result = await x("npm", ["install"]);
-      if (result.exitCode !== 0) {
-        throw new Error("Failed to install dependencies");
-      }
-      ctx.installed = true;
-      s.stop("Installed via npm");
-    } catch (error) {
+    ctx.installed = await installDependencies(project.path);
+    if (!ctx.installed) {
       s.stop("Failed to install dependencies");
+    } else {
+      s.stop("Installed dependencies");
     }
   }
 
@@ -136,7 +130,7 @@ export const main = async () => {
     ctx.installed ? "" : "pnpm install\n"
   }pnpm dev`;
 
-  p.note(nextSteps, "Next steps.");
+  p.note(nextSteps, "Next steps");
 
   p.outro("Have fun building with LuxeCMS! 🎉");
 };
