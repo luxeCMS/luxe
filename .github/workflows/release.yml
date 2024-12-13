@@ -96,26 +96,27 @@ jobs:
             exit 1
           fi
 
-      # Configure git for changesets
       - name: Configure Git User
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      # Enter prerelease mode if needed
+      - name: Configure NPM
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
+          echo "access=public" >> ~/.npmrc
+
       - name: Configure Prerelease Mode
         if: steps.release_type.outputs.is_prerelease == 'true'
         run: |
           echo "Entering prerelease mode for ${{ steps.release_type.outputs.tag }}"
           pnpm changeset pre enter ${{ steps.release_type.outputs.tag }}
 
-      # Version packages
       - name: Version Packages
         run: |
-          # Skip prompt with -y flag
           pnpm changeset version -y
 
-      # Create or update changelog
       - name: Update Changelog
         run: |
           if [ -f "CHANGELOG.md" ]; then
@@ -126,27 +127,25 @@ jobs:
           git add "**/CHANGELOG.md" || true
           git add "**/package.json"
 
-          # Only commit if there are changes
           if ! git diff --cached --quiet; then
             git commit -m "chore: update versions and changelog"
           fi
 
-      # Publish packages
       - name: Publish Packages
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          pnpm publish -r --no-git-checks --tag ${{ steps.release_type.outputs.npm_tag }} --access public
+          echo "Publishing packages..."
+          pnpm run publish
         env:
           NPM_CONFIG_PROVENANCE: true
           NODE_ENV: production
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Push version changes back to main
       - name: Push Changes
         run: |
           git push origin main
           git push origin --tags
 
-      # Create GitHub Release
       - name: Create GitHub Releases
         run: |
           create_release() {
@@ -214,7 +213,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
 
-      # Exit prerelease mode if we were in it
       - name: Exit Prerelease Mode
         if: steps.release_type.outputs.is_prerelease == 'true'
         run: pnpm changeset pre exit
