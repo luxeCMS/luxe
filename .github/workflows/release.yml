@@ -10,7 +10,6 @@ env:
   NODE_VERSION: 20
   PNPM_VERSION: 9
 
-# Concurrency group to ensure only one release workflow runs at a time
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -18,7 +17,6 @@ concurrency:
 jobs:
   release:
     name: Release
-    # Only run if PR was merged and has a release label
     if: |
       github.event.pull_request.merged == true &&
       (contains(github.event.pull_request.labels.*.name, 'release:preview') ||
@@ -29,14 +27,14 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      id-token: write # Needed for NPM provenance
+      id-token: write
 
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: main # Explicitly checkout main since we're triggered on PR
+          ref: main
           token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
 
       - name: Setup pnpm
@@ -73,11 +71,13 @@ jobs:
                 echo "type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
                 echo "tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
                 echo "npm_tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+                echo "is_prerelease=true" >> $GITHUB_OUTPUT
                 ;;
               stable)
                 echo "type=stable" >> $GITHUB_OUTPUT
                 echo "tag=latest" >> $GITHUB_OUTPUT
                 echo "npm_tag=latest" >> $GITHUB_OUTPUT
+                echo "is_prerelease=false" >> $GITHUB_OUTPUT
                 ;;
               *)
                 echo "Invalid release type: $RELEASE_TYPE"
@@ -96,53 +96,86 @@ jobs:
             exit 1
           fi
 
-      - name: Create Release Pull Request or Publish
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          publish: pnpm run release
-          commit: "chore: version packages"
-          title: "chore: version packages"
-          createGithubReleases: true
+      # Configure git for changesets
+      - name: Configure Git User
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      # Enter prerelease mode if needed
+      - name: Configure Prerelease Mode
+        if: steps.release_type.outputs.is_prerelease == 'true'
+        run: |
+          echo "Entering prerelease mode for ${{ steps.release_type.outputs.tag }}"
+          pnpm changeset pre enter ${{ steps.release_type.outputs.tag }}
+
+      # Version packages
+      - name: Version Packages
+        run: |
+          # Skip prompt with -y flag
+          pnpm changeset version -y
+
+      # Create or update changelog
+      - name: Update Changelog
+        run: |
+          if [ -f "CHANGELOG.md" ]; then
+            echo "Updating CHANGELOG.md"
+            git add CHANGELOG.md
+          fi
+          git add .changeset/*.md || true
+          git add "**/CHANGELOG.md" || true
+          git add "**/package.json"
+
+          # Only commit if there are changes
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update versions and changelog"
+          fi
+
+      # Publish packages
+      - name: Publish Packages
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          pnpm publish -r --no-git-checks --tag ${{ steps.release_type.outputs.npm_tag }} --access public
         env:
-          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
           NODE_ENV: production
 
+      # Push version changes back to main
+      - name: Push Changes
+        run: |
+          git push origin main
+          git push origin --tags
+
+      # Create GitHub Release
       - name: Create GitHub Releases
-        if: steps.changesets.outputs.published == 'true'
         run: |
           create_release() {
             local PKG_PATH=$1
             local PKG_JSON="${PKG_PATH}/package.json"
             
-            # Verify package.json exists
             if [[ ! -f "$PKG_JSON" ]]; then
               echo "Error: package.json not found at $PKG_JSON"
               return 1
             }
             
-            # Extract package details with error checking
             local PKG_NAME PKG_VERSION
             PKG_NAME=$(node -p "require('./${PKG_JSON}').name" 2>/dev/null)
             PKG_VERSION=$(node -p "require('./${PKG_JSON}').version" 2>/dev/null)
             
             if [[ -z "$PKG_NAME" || -z "$PKG_VERSION" ]]; then
-              echo "Error: Failed to extract package name or version from $PKG_JSON"
+              echo "Error: Failed to extract package name or version"
               return 1
             }
             
             local RELEASE_TAG="${{ steps.release_type.outputs.tag }}"
-            local RELEASE_NAME="${PKG_NAME}@v${PKG_VERSION}"
+            local RELEASE_NAME="${PKG_NAME}@${PKG_VERSION}"
             [[ "$RELEASE_TAG" != "latest" ]] && RELEASE_NAME="${RELEASE_NAME}-${RELEASE_TAG}"
             
             local PRERELEASE=""
-            [[ "$RELEASE_TAG" != "latest" ]] && PRERELEASE="--prerelease"
+            [[ "${{ steps.release_type.outputs.is_prerelease }}" == "true" ]] && PRERELEASE="--prerelease"
             
             echo "Creating release: $RELEASE_NAME"
             
-            # Attempt to create release with retry logic
             local max_attempts=3
             local attempt=1
             while (( attempt <= max_attempts )); do
@@ -158,12 +191,10 @@ jobs:
               ((attempt++))
             done
             
-            echo "Failed to create release after $max_attempts attempts"
             return 1
           }
 
-          # Process each package
-          echo "Looking for changed packages..."
+          echo "Creating GitHub releases..."
           FAILED_PACKAGES=()
 
           for pkg in packages/*/; do
@@ -176,15 +207,19 @@ jobs:
           done
 
           if (( ${#FAILED_PACKAGES[@]} > 0 )); then
-            echo "Failed to create releases for the following packages:"
+            echo "Failed to create releases for:"
             printf '%s\n' "${FAILED_PACKAGES[@]}"
             exit 1
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
 
+      # Exit prerelease mode if we were in it
+      - name: Exit Prerelease Mode
+        if: steps.release_type.outputs.is_prerelease == 'true'
+        run: pnpm changeset pre exit
+
       - name: Handle Failure
         if: failure()
         run: |
           echo "::error::Release workflow failed. Please check the logs for details."
-          # Could add additional failure handling here, like notifications
