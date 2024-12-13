@@ -115,11 +115,12 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-      - name: Configure NPM
+      - name: Configure NPM for Publishing
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
           echo "access=public" >> ~/.npmrc
+          npm whoami
 
       - name: Configure Prerelease Mode
         if: steps.release_type.outputs.is_prerelease == 'true'
@@ -147,6 +148,22 @@ jobs:
 
       - name: Publish Packages
         run: |
+        # Verify npm authentication
+          echo "Verifying npm authentication..."
+          if ! npm whoami; then
+            echo "NPM authentication failed"
+            exit 1
+          fi
+
+          echo "Checking package visibility..."
+          for pkg in packages/*/; do
+            if [[ -f "${pkg}package.json" ]]; then
+              PKG_NAME=$(node -p "require('./${pkg}package.json').name")
+              echo "Checking access for $PKG_NAME..."
+              npm access list packages "$PKG_NAME" || true
+            fi
+          done
+          
           # Try to publish with --access public flag first (for new packages)
           if ! pnpm changeset publish --access public; then
             echo "First publish attempt failed, trying without --access public flag"
