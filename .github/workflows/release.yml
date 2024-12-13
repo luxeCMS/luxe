@@ -5,6 +5,18 @@ on:
     types: [closed]
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: "Release Type"
+        required: true
+        default: "alpha"
+        type: choice
+        options:
+          - preview
+          - alpha
+          - beta
+          - stable
 
 env:
   NODE_VERSION: 20
@@ -18,11 +30,13 @@ jobs:
   release:
     name: Release
     if: |
-      github.event.pull_request.merged == true &&
-      (contains(github.event.pull_request.labels.*.name, 'release:preview') ||
-       contains(github.event.pull_request.labels.*.name, 'release:alpha') ||
-       contains(github.event.pull_request.labels.*.name, 'release:beta') ||
-       contains(github.event.pull_request.labels.*.name, 'release:stable'))
+      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'pull_request' && 
+       github.event.pull_request.merged == true && 
+       (contains(github.event.pull_request.labels.*.name, 'release:preview') ||
+        contains(github.event.pull_request.labels.*.name, 'release:alpha') ||
+        contains(github.event.pull_request.labels.*.name, 'release:beta') ||
+        contains(github.event.pull_request.labels.*.name, 'release:stable')))
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -61,33 +75,33 @@ jobs:
       - name: Set Release Type
         id: release_type
         run: |
-          LABELS="${{ toJSON(github.event.pull_request.labels.*.name) }}"
-          if [[ $LABELS =~ release:(preview|alpha|beta|stable) ]]; then
-            RELEASE_TYPE=$(echo $LABELS | grep -o 'release:\(preview\|alpha\|beta\|stable\)' | head -n1 | cut -d: -f2)
-            echo "Found release type: $RELEASE_TYPE"
-            
-            case $RELEASE_TYPE in
-              preview|alpha|beta)
-                echo "type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
-                echo "tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
-                echo "npm_tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
-                echo "is_prerelease=true" >> $GITHUB_OUTPUT
-                ;;
-              stable)
-                echo "type=stable" >> $GITHUB_OUTPUT
-                echo "tag=latest" >> $GITHUB_OUTPUT
-                echo "npm_tag=latest" >> $GITHUB_OUTPUT
-                echo "is_prerelease=false" >> $GITHUB_OUTPUT
-                ;;
-              *)
-                echo "Invalid release type: $RELEASE_TYPE"
-                exit 1
-                ;;
-            esac
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            RELEASE_TYPE="${{ github.event.inputs.releaseType }}"
           else
-            echo "No valid release label found"
-            exit 1
+            LABELS="${{ toJSON(github.event.pull_request.labels.*.name) }}"
+            RELEASE_TYPE=$(echo $LABELS | grep -o 'release:\(preview\|alpha\|beta\|stable\)' | head -n1 | cut -d: -f2)
           fi
+
+          echo "Found release type: $RELEASE_TYPE"
+
+          case $RELEASE_TYPE in
+            preview|alpha|beta)
+              echo "type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+              echo "tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+              echo "npm_tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+              echo "is_prerelease=true" >> $GITHUB_OUTPUT
+              ;;
+            stable)
+              echo "type=stable" >> $GITHUB_OUTPUT
+              echo "tag=latest" >> $GITHUB_OUTPUT
+              echo "npm_tag=latest" >> $GITHUB_OUTPUT
+              echo "is_prerelease=false" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "Invalid release type: $RELEASE_TYPE"
+              exit 1
+              ;;
+          esac
 
       - name: Build Packages
         run: |
