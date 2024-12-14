@@ -59,7 +59,7 @@ importers:
         version: 8.11.10
       luxe-scripts:
         specifier: workspace:*
-        version: link:../../scripts
+        version: link:../luxe-scripts
 
   packages/luxe:
     dependencies:
@@ -111,7 +111,7 @@ importers:
         version: 2.1.8(vitest@2.1.8(@types/node@20.17.10))
       luxe-scripts:
         specifier: workspace:*
-        version: link:../../scripts
+        version: link:../luxe-scripts
       tsup:
         specifier: ^8.0.2
         version: 8.3.5(postcss@8.4.49)(tsx@4.19.2)(typescript@5.7.2)(yaml@2.6.1)
@@ -122,17 +122,7 @@ importers:
         specifier: ^2.1.8
         version: 2.1.8(@types/node@20.17.10)
 
-  packages/luxe/test/fixtures/config-no-default-export: {}
-
-  packages/luxe/test/fixtures/config-not-found: {}
-
-  packages/luxe/test/fixtures/js-valid-config: {}
-
-  packages/luxe/test/fixtures/mjs-valid-config: {}
-
-  packages/luxe/test/fixtures/ts-valid-config: {}
-
-  scripts:
+  packages/luxe-scripts:
     dependencies:
       '@types/glob':
         specifier: ^8.1.0
@@ -149,6 +139,16 @@ importers:
       tinyexec:
         specifier: ^0.3.1
         version: 0.3.1
+
+  packages/luxe/test/fixtures/config-no-default-export: {}
+
+  packages/luxe/test/fixtures/config-not-found: {}
+
+  packages/luxe/test/fixtures/js-valid-config: {}
+
+  packages/luxe/test/fixtures/mjs-valid-config: {}
+
+  packages/luxe/test/fixtures/ts-valid-config: {}
 
 packages:
 
