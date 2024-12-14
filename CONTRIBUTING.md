@@ -45,7 +45,7 @@ pnpm test
 
 ### Branch & Development Workflow
 
-1. Create a new branch from `main`:
+1. Create a new branch from `develop`:
 
    ```shell
    git checkout -b feat/my-feature
@@ -61,7 +61,7 @@ pnpm test
    pnpm check              # Check code style
    ```
 
-3. Document your changes with a changeset:
+3. When you are ready to merge back to the `develop` branch, document your changes with a changeset:
 
    ```shell
    pnpm changeset
@@ -113,30 +113,18 @@ pnpm test
 
 ### Release Process
 
-When creating your pull request, you can control the release process using labels:
+When creating a pull request to `main`, you can control the release process using labels.
+A label **must** be added to your PR when merging a PR to `main`. The following labels are available:
 
 - `release:stable` - Production release (npm tag: `latest`)
 
   - Use for stable features and bug fixes
-  - Appears in main changelog
   - Creates a standard GitHub release
 
 - `release:beta` - Beta release (npm tag: `beta`)
 
   - Use for feature-complete but untested changes
   - Marked as pre-release on GitHub
-  - Won't appear in stable changelog
-
-- `release:alpha` - Alpha release (npm tag: `alpha`)
-
-  - Use for work-in-progress features
-  - Marked as pre-release on GitHub
-  - May contain breaking changes
-
-- `release:preview` - Preview release (npm tag: `preview`)
-  - Use for experimental features
-  - Marked as pre-release on GitHub
-  - May be unstable
 
 **Release workflow**:
 
@@ -147,56 +135,6 @@ When creating your pull request, you can control the release process using label
    - Publish to npm with appropriate tags
    - Create GitHub releases
    - Update package changelogs
-
-### Tips for Good Pull Requests
-
-1. **Package Selection**: When creating a changeset, carefully select only the packages that have actually changed.
-
-2. **Version Bumping**:
-
-   - `major`: Breaking changes that require user code modifications
-   - `minor`: New features that are backward compatible
-   - `patch`: Bug fixes and minor changes
-
-3. **Change Description**:
-
-   - Write from the user's perspective
-   - Include migration steps for breaking changes
-   - Reference related issues/PRs
-   - Consider including code examples for API changes
-
-4. **Testing**:
-
-   - Add/update tests for new features
-   - Verify all tests pass: `pnpm test`
-   - Check style and formatting: `pnpm check`
-   - Ensure builds succeed: `pnpm build`
-
-5. **Documentation**:
-
-   - Update relevant package README files
-   - Add JSDoc comments for new APIs
-   - Update any affected examples
-
-6. **Changelogs**: The changeset becomes your changelog entry, so make it informative and user-focused.
-   Example:
-
-   ````
-   Added new `useTheme` hook that provides type-safe access to theme values.
-
-   ```tsx
-   const theme = useTheme()
-   const primary = theme.colors.primary
-   ```
-
-   Breaking Changes:
-
-   - Removed support for legacy theme format
-   - Theme object structure has changed
-
-   Fixes #789
-
-   ````
 
 ## Project Status
 
