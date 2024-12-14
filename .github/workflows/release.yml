@@ -5,51 +5,32 @@ on:
     types: [closed]
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      releaseType:
-        description: "Release Type"
-        required: true
-        default: "alpha"
-        type: choice
-        options:
-          - preview
-          - alpha
-          - beta
-          - stable
 
 env:
   NODE_VERSION: 20
   PNPM_VERSION: 9
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: release-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   release:
-    name: Release
-    if: |
-      github.event_name == 'workflow_dispatch' || 
-      (github.event_name == 'pull_request' && 
-       github.event.pull_request.merged == true && 
-       (contains(github.event.pull_request.labels.*.name, 'release:preview') ||
-        contains(github.event.pull_request.labels.*.name, 'release:alpha') ||
-        contains(github.event.pull_request.labels.*.name, 'release:beta') ||
-        contains(github.event.pull_request.labels.*.name, 'release:stable')))
     runs-on: ubuntu-latest
+    if: |
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.ref == 'develop'
     permissions:
       contents: write
       pull-requests: write
       id-token: write
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: main
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -60,195 +41,92 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          registry-url: "https://registry.npmjs.org"
+          registry-url: "https://registry.npmjs.org/"
           cache: "pnpm"
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Tests
-        run: pnpm run test
+      - name: Determine Release Type
+        id: determine_release_type
+        run: |
+          # Extract PR labels
+          LABELS=$(echo "${{ toJSON(github.event.pull_request.labels.*.name) }}" | jq -r '.[]')
+
+          # Check for beta or stable labels
+          IS_BETA=false
+          IS_STABLE=false
+
+          for label in $LABELS; do
+            if [ "$label" = "release:beta" ]; then
+              IS_BETA=true
+            fi
+            if [ "$label" = "release:stable" ]; then
+              IS_STABLE=true
+            fi
+          done
+
+          if [ "$IS_BETA" = false ] && [ "$IS_STABLE" = false ]; then
+            echo "No release label found. Failing..."
+            exit 1
+          fi
+
+          if [ "$IS_BETA" = true ] && [ "$IS_STABLE" = true ]; then
+            echo "Both stable and beta labels found. Please choose one."
+            exit 1
+          fi
+
+          if [ "$IS_BETA" = true ]; then
+            echo "release_type=beta" >> $GITHUB_OUTPUT
+            echo "npm_tag=beta" >> $GITHUB_OUTPUT
+          elif [ "$IS_STABLE" = true ]; then
+            echo "release_type=stable" >> $GITHUB_OUTPUT
+            echo "npm_tag=latest" >> $GITHUB_OUTPUT
+          fi
 
       - name: Lint and Format
         run: pnpm run check
 
-      - name: Set Release Type
-        id: release_type
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            RELEASE_TYPE="${{ github.event.inputs.releaseType }}"
-          else
-            LABELS="${{ toJSON(github.event.pull_request.labels.*.name) }}"
-            RELEASE_TYPE=$(echo $LABELS | grep -o 'release:\(preview\|alpha\|beta\|stable\)' | head -n1 | cut -d: -f2)
-          fi
+      - name: Run Tests
+        run: pnpm run test
 
-          echo "Found release type: $RELEASE_TYPE"
+      # Enter pre-release mode for beta
+      - name: Enter Beta Pre-Release Mode
+        if: steps.determine_release_type.outputs.release_type == 'beta'
+        run: pnpm changeset pre enter beta
 
-          case $RELEASE_TYPE in
-            preview|alpha|beta)
-              echo "type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
-              echo "tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
-              echo "npm_tag=$RELEASE_TYPE" >> $GITHUB_OUTPUT
-              echo "is_prerelease=true" >> $GITHUB_OUTPUT
-              ;;
-            stable)
-              echo "type=stable" >> $GITHUB_OUTPUT
-              echo "tag=latest" >> $GITHUB_OUTPUT
-              echo "npm_tag=latest" >> $GITHUB_OUTPUT
-              echo "is_prerelease=false" >> $GITHUB_OUTPUT
-              ;;
-            *)
-              echo "Invalid release type: $RELEASE_TYPE"
-              exit 1
-              ;;
-          esac
-
-      - name: Build Packages
-        run: |
-          if ! pnpm run build; then
-            echo "Build failed"
-            exit 1
-          fi
-
-      - name: Configure Git User
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-
-      - name: Configure Prerelease Mode
-        if: steps.release_type.outputs.is_prerelease == 'true'
-        run: |
-          echo "Entering prerelease mode for ${{ steps.release_type.outputs.tag }}"
-          pnpm changeset pre enter ${{ steps.release_type.outputs.tag }}
+      # Exit pre-release mode for stable
+      - name: Exit Pre-Release Mode
+        if: steps.determine_release_type.outputs.release_type == 'stable'
+        run: pnpm changeset pre exit || true
 
       - name: Version Packages
-        run: |
-          pnpm changeset version -y
+        run: pnpm changeset version
 
-      - name: Update Changelog
-        run: |
-          if [ -f "CHANGELOG.md" ]; then
-            echo "Updating CHANGELOG.md"
-            git add CHANGELOG.md
-          fi
-          git add .changeset/*.md || true
-          git add "**/CHANGELOG.md" || true
-          git add "**/package.json"
+      - name: Build Packages
+        run: pnpm build
 
+      - name: Commit Version Changes
+        run: |
+          # Add and commit the updated package versions and changelogs
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
           if ! git diff --cached --quiet; then
-            git commit -m "chore: update versions and changelog"
+            git commit -m "chore: update versions and changelogs"
+            git push origin main
           fi
 
       - name: Publish Packages
-        run: |
-          # Configure NPM authentication
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "access=public" >> .npmrc
-
-          # Verify the token works
-          if ! npm whoami --registry https://registry.npmjs.org/; then
-            echo "NPM authentication failed. Please check your NPM_TOKEN."
-            exit 1
-          fi
-
-          # Try to publish with --access public flag first (for new packages)
-          if ! pnpm changeset publish --access public; then
-            echo "First publish attempt failed, trying without --access public flag"
-            # If that fails, try normal publish (for existing packages)
-            if ! pnpm changeset publish; then
-              echo "Publishing failed"
-              exit 1
-            fi
-          fi
         env:
-          NPM_CONFIG_PROVENANCE: true
-          NODE_ENV: production
-          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Push Changes
         run: |
-          git push origin main
-          git push origin --tags
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo "always-auth=true" >> .npmrc
 
-      - name: Create GitHub Releases
-        run: |
-          create_release() {
-            local PKG_PATH="$1"
-            local PKG_JSON="${PKG_PATH}/package.json"
-            
-            if [ ! -f "$PKG_JSON" ]; then
-              echo "Error: package.json not found at $PKG_JSON"
-              return 1
-            fi
-            
-            local PKG_NAME
-            local PKG_VERSION
-            PKG_NAME=$(node -p "require('./${PKG_JSON}').name" 2>/dev/null)
-            PKG_VERSION=$(node -p "require('./${PKG_JSON}').version" 2>/dev/null)
-            
-            if [ -z "$PKG_NAME" ] || [ -z "$PKG_VERSION" ]; then
-              echo "Error: Failed to extract package name or version"
-              return 1
-            fi
-            
-            local RELEASE_TAG="${{ steps.release_type.outputs.tag }}"
-            local RELEASE_NAME="${PKG_NAME}@${PKG_VERSION}"
-            if [ "$RELEASE_TAG" != "latest" ]; then
-              RELEASE_NAME="${RELEASE_NAME}-${RELEASE_TAG}"
-            fi
-            
-            local PRERELEASE=""
-            if [ "${{ steps.release_type.outputs.is_prerelease }}" = "true" ]; then
-              PRERELEASE="--prerelease"
-            fi
-            
-            echo "Creating release: $RELEASE_NAME"
-            
-            local max_attempts=3
-            local attempt=1
-            while [ $attempt -le $max_attempts ]; do
-              if gh release create "$RELEASE_NAME" \
-                --title "$RELEASE_NAME" \
-                --notes "See CHANGELOG.md for details" \
-                $PRERELEASE; then
-                return 0
-              fi
-              
-              echo "Attempt $attempt failed. Retrying in 5 seconds..."
-              sleep 5
-              attempt=$((attempt + 1))
-            done
-            
-            return 1
-          }
-
-          echo "Creating GitHub releases..."
-          FAILED_PACKAGES=()
-
-          for pkg in packages/*/; do
-            if [ -f "${pkg}package.json" ]; then
-              echo "Processing ${pkg}..."
-              if ! create_release "$pkg"; then
-                FAILED_PACKAGES+=("$pkg")
-              fi
-            fi
-          done
-
-          if [ ${#FAILED_PACKAGES[@]} -gt 0 ]; then
-            echo "Failed to create releases for:"
-            printf '%s\n' "${FAILED_PACKAGES[@]}"
-            exit 1
+          if [ "${{ steps.determine_release_type.outputs.release_type }}" = "beta" ]; then
+            pnpm changeset publish --tag beta
+          else
+            pnpm changeset publish
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-
-      - name: Exit Prerelease Mode
-        if: steps.release_type.outputs.is_prerelease == 'true'
-        run: pnpm changeset pre exit
-
-      - name: Handle Failure
-        if: failure()
-        run: |
-          echo "::error::Release workflow failed. Please check the logs for details."
