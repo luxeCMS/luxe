@@ -1,0 +1,12 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "create-luxe": "0.0.3",
+    "luxecms": "0.0.1",
+    "luxe-scripts": "0.0.1"
+  },
+  "changesets": [
+    "wild-snakes-taste"
+  ]
+}
