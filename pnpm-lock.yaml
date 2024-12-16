@@ -29,24 +29,15 @@ importers:
       '@bluwy/giget-core':
         specifier: ^0.1.2
         version: 0.1.2
-      '@clack/core':
-        specifier: ^0.3.5
-        version: 0.3.5
       '@clack/prompts':
         specifier: ^0.8.2
         version: 0.8.2
-      is-unicode-supported:
-        specifier: ^2.1.0
-        version: 2.1.0
       pg:
         specifier: ^8.13.1
         version: 8.13.1
       picocolors:
         specifier: ^1.1.1
         version: 1.1.1
-      sisteransi:
-        specifier: ^1.0.5
-        version: 1.0.5
       tinyexec:
         specifier: ^0.3.1
         version: 0.3.1
@@ -59,7 +50,7 @@ importers:
         version: 8.11.10
       luxe-scripts:
         specifier: workspace:*
-        version: link:../../scripts
+        version: link:../luxe-scripts
 
   packages/luxe:
     dependencies:
@@ -111,7 +102,7 @@ importers:
         version: 2.1.8(vitest@2.1.8(@types/node@20.17.10))
       luxe-scripts:
         specifier: workspace:*
-        version: link:../../scripts
+        version: link:../luxe-scripts
       tsup:
         specifier: ^8.0.2
         version: 8.3.5(postcss@8.4.49)(tsx@4.19.2)(typescript@5.7.2)(yaml@2.6.1)
@@ -122,17 +113,7 @@ importers:
         specifier: ^2.1.8
         version: 2.1.8(@types/node@20.17.10)
 
-  packages/luxe/test/fixtures/config-no-default-export: {}
-
-  packages/luxe/test/fixtures/config-not-found: {}
-
-  packages/luxe/test/fixtures/js-valid-config: {}
-
-  packages/luxe/test/fixtures/mjs-valid-config: {}
-
-  packages/luxe/test/fixtures/ts-valid-config: {}
-
-  scripts:
+  packages/luxe-scripts:
     dependencies:
       '@types/glob':
         specifier: ^8.1.0
@@ -149,6 +130,16 @@ importers:
       tinyexec:
         specifier: ^0.3.1
         version: 0.3.1
+
+  packages/luxe/test/fixtures/config-no-default-export: {}
+
+  packages/luxe/test/fixtures/config-not-found: {}
+
+  packages/luxe/test/fixtures/js-valid-config: {}
+
+  packages/luxe/test/fixtures/mjs-valid-config: {}
+
+  packages/luxe/test/fixtures/ts-valid-config: {}
 
 packages:
 
@@ -1283,10 +1274,6 @@ packages:
   is-subdir@1.2.0:
     resolution: {integrity: sha512-2AT6j+gXe/1ueqbW6fLZJiIw3F8iXGJtt0yDrZaBhAZEG1raiTxKWU+IPqMCzQAXOUCKdA4UDMgacKH25XG2Cw==}
     engines: {node: '>=4'}
-
-  is-unicode-supported@2.1.0:
-    resolution: {integrity: sha512-mE00Gnza5EEB3Ds0HfMyllZzbBrmLOX3vfWoj9A9PEnTfratQ/BcaJOuMhnkhjXvb2+FkY3VuHqtAGpTPmglFQ==}
-    engines: {node: '>=18'}
 
   is-windows@1.0.2:
     resolution: {integrity: sha512-eXK1UInq2bPmjyX6e3VHIzMLobc4J94i4AWn+Hpq3OU5KkrRC96OAcR3PRJ/pGu6m8TRnBHP9dkXQVsT/COVIA==}
@@ -3050,8 +3037,6 @@ snapshots:
   is-subdir@1.2.0:
     dependencies:
       better-path-resolve: 1.0.0
-
-  is-unicode-supported@2.1.0: {}
 
   is-windows@1.0.2: {}
 
