@@ -103,6 +103,8 @@ jobs:
         run: pnpm changeset pre exit || true
 
       - name: Version Packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
         run: pnpm changeset version
 
       - name: Build Packages
@@ -122,6 +124,7 @@ jobs:
       - name: Publish Packages
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
         run: |
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
           echo "registry=https://registry.npmjs.org/" >> .npmrc
