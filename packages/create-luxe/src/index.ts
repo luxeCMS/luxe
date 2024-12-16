@@ -8,9 +8,6 @@ import {
   renamePackageName,
   setupEnvFile,
 } from "./utils.js";
-import { x } from "tinyexec";
-import path from "node:path";
-import fs from "node:fs/promises";
 
 export const main = async () => {
   console.clear();
