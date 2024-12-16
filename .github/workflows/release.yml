@@ -50,38 +50,40 @@ jobs:
       - name: Determine Release Type
         id: determine_release_type
         run: |
-          # Extract PR labels
-          LABELS=$(echo "${{ toJSON(github.event.pull_request.labels.*.name) }}" | jq -r '.[]')
+          LABELS=$(echo '${{ toJson(github.event.pull_request.labels) }}' | jq -r '.[].name')
 
-          # Check for beta or stable labels
+          # Initialize flags
           IS_BETA=false
           IS_STABLE=false
 
-          for label in $LABELS; do
-            if [ "$label" = "release:beta" ]; then
-              IS_BETA=true
-            fi
-            if [ "$label" = "release:stable" ]; then
-              IS_STABLE=true
-            fi
-          done
+          # Process each label
+          while IFS= read -r label; do
+            case "$label" in
+              "release:beta")
+                IS_BETA=true
+                ;;
+              "release:stable")
+                IS_STABLE=true
+                ;;
+            esac
+          done <<< "$LABELS"
 
           if [ "$IS_BETA" = false ] && [ "$IS_STABLE" = false ]; then
-            echo "No release label found. Failing..."
+            echo "::error::No release label found. Add either 'release:beta' or 'release:stable' label."
             exit 1
           fi
 
           if [ "$IS_BETA" = true ] && [ "$IS_STABLE" = true ]; then
-            echo "Both stable and beta labels found. Please choose one."
+            echo "::error::Both stable and beta labels found. Please choose only one."
             exit 1
           fi
 
           if [ "$IS_BETA" = true ]; then
-            echo "release_type=beta" >> $GITHUB_OUTPUT
-            echo "npm_tag=beta" >> $GITHUB_OUTPUT
-          elif [ "$IS_STABLE" = true ]; then
-            echo "release_type=stable" >> $GITHUB_OUTPUT
-            echo "npm_tag=latest" >> $GITHUB_OUTPUT
+            echo "release_type=beta" >> "$GITHUB_OUTPUT"
+            echo "npm_tag=beta" >> "$GITHUB_OUTPUT"
+          else
+            echo "release_type=stable" >> "$GITHUB_OUTPUT"
+            echo "npm_tag=latest" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Lint and Format
