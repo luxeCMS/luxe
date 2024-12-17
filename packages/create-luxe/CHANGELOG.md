@@ -1,5 +1,11 @@
 # create-luxe
 
+## 0.0.4.beta.0
+
+### Patch Changes
+
+- chore(create-luxe): removed some unused imports and unused packages
+
 ## 0.0.3
 
 ### Patch Changes
