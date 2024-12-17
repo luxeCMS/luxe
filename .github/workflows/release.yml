@@ -47,13 +47,15 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          version: pnpm run version
+          version: pnpm changeset version
           commit: "chore: update versions and changelogs"
           title: "chore: version packages"
-          publish: |
-            pnpm build
-            pnpm run publish
+          publish: pnpm changeset publish
           createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Build
+        if: steps.changesets.outputs.published == 'true'
+        run: pnpm build
