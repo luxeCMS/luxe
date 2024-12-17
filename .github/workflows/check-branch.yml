@@ -9,8 +9,8 @@ jobs:
   check_branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Check branch
+      - name: Check source branch
         if: github.base_ref == 'main' && github.head_ref != 'develop'
         run: |
-          echo "ERROR: You can only merge to 'main' from 'develop'."
+          echo "ERROR: PRs to 'main' branch must come from 'develop' branch only"
           exit 1

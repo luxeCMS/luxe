@@ -43,7 +43,10 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Create Release Pull Request or Publish
+      - name: Build
+        run: pnpm build
+
+      - name: Create Release and Publish
         id: changesets
         uses: changesets/action@v1
         with:
@@ -55,7 +58,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Build
-        if: steps.changesets.outputs.published == 'true'
-        run: pnpm build
