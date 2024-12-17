@@ -129,7 +129,7 @@ jobs:
 
           if [ "${{ steps.determine_release_type.outputs.release_type }}" = "beta" ]; then
             pnpm changeset version
-            pnpm changeset publish
+            pnpm changeset publish --tag beta
           else
             pnpm changeset version
             pnpm changeset publish
