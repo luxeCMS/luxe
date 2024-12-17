@@ -90,12 +90,12 @@ jobs:
       - name: Run Tests
         run: pnpm run test
 
-      # Enter pre-release mode for beta
       - name: Enter Beta Pre-Release Mode
         if: steps.determine_release_type.outputs.release_type == 'beta'
-        run: pnpm changeset pre enter beta
+        run: |
+          pnpm changeset pre exit
+          pnpm changeset pre enter beta
 
-      # Exit pre-release mode for stable
       - name: Exit Pre-Release Mode
         if: steps.determine_release_type.outputs.release_type == 'stable'
         run: pnpm changeset pre exit || true
@@ -129,9 +129,8 @@ jobs:
 
           if [ "${{ steps.determine_release_type.outputs.release_type }}" = "beta" ]; then
             pnpm changeset version
-            pnpm changeset publish
+            pnpm changeset publish --tag beta
           else
-            pnpm changeset pre exit
             pnpm changeset version
             pnpm changeset publish
           fi
