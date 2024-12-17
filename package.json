@@ -9,9 +9,8 @@
     "format": "biome format --write .",
     "lint": "biome lint --write .",
     "check": "biome check --write .",
-    "changeset": "changeset",
     "version": "changeset version",
-    "publish": "changeset publish"
+    "release": "changeset publish"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
