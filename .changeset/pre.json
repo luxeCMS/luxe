@@ -6,7 +6,5 @@
     "luxecms": "0.0.1",
     "luxe-scripts": "0.0.1"
   },
-  "changesets": [
-    "wild-snakes-taste"
-  ]
+  "changesets": []
 }
