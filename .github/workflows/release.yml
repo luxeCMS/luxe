@@ -127,10 +127,5 @@ jobs:
           echo "registry=https://registry.npmjs.org/" >> .npmrc
           echo "always-auth=true" >> .npmrc
 
-          if [ "${{ steps.determine_release_type.outputs.release_type }}" = "beta" ]; then
-            pnpm changeset version
-            pnpm changeset publish --tag beta
-          else
-            pnpm changeset version
-            pnpm changeset publish
-          fi
+          pnpm changeset version
+          pnpm changeset publish
