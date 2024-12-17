@@ -131,7 +131,13 @@ jobs:
           echo "always-auth=true" >> .npmrc
 
           if [ "${{ steps.determine_release_type.outputs.release_type }}" = "beta" ]; then
-            pnpm changeset publish --tag beta
+            # Make sure we're in pre mode for beta
+            pnpm changeset pre enter beta
+            pnpm changeset version
+            pnpm changeset publish
           else
+            # Exit pre mode for regular releases
+            pnpm changeset pre exit
+            pnpm changeset version
             pnpm changeset publish
           fi
