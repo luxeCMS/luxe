@@ -100,32 +100,18 @@ jobs:
         if: steps.determine_release_type.outputs.release_type == 'stable'
         run: pnpm changeset pre exit || true
 
-      - name: Version Packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-        run: pnpm changeset version
-
       - name: Build Packages
         run: pnpm build
 
-      - name: Commit Version Changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: update versions and changelogs"
-            git push origin main
-          fi
-
-      - name: Publish Packages
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: pnpm changeset version
+          commit: "chore: update versions and changelogs"
+          title: "chore: version packages"
+          publish: pnpm changeset publish
+          createGithubReleases: true
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-          echo "registry=https://registry.npmjs.org/" >> .npmrc
-          echo "always-auth=true" >> .npmrc
-
-          pnpm changeset version
-          pnpm changeset publish
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
