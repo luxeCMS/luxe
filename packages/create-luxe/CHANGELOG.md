@@ -1,10 +1,11 @@
 # create-luxe
 
-## 0.0.4.beta.0
+
+## 0.0.4-beta.0
 
 ### Patch Changes
 
-- chore(create-luxe): removed some unused imports and unused packages
+- [#32](https://github.com/luxeCMS/luxe/pull/32) [`e2b93ee`](https://github.com/luxeCMS/luxe/commit/e2b93ee36f64c7228c85c11e91ab5be97635c4cb) Thanks [@RATIU5](https://github.com/RATIU5)! - chore(create-luxe): removed some unused imports and unused packages
 
 ## 0.0.3
 

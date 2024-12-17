@@ -1,6 +1,6 @@
-import { downloadTemplate } from "@bluwy/giget-core";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { downloadTemplate } from "@bluwy/giget-core";
 import pg from "pg";
 import { x } from "tinyexec";
 
