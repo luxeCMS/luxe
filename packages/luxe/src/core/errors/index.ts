@@ -387,5 +387,17 @@ export const LuxeErrors = {
       message: "Invalid PostgreSQL URL",
       hint: "Make sure the 'postgresUrl' property in your configuration file is a valid PostgreSQL URL.",
     }),
+
+    /**
+     * Use this error when a configuration file has an invalid hook function.
+     * @param hook the name of the hook
+     * @returns a LuxeError factory
+     */
+    InvalidHookFn: (hook: string) =>
+      LuxeError.create({
+        code: "INVALID_HOOK",
+        message: `Invalid hook function for: ${hook}`,
+        hint: "Review the documentation for the available hooks and make sure you are defining the correct function for each hook.",
+      }),
   },
 } as const;

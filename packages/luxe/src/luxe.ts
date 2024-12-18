@@ -8,7 +8,7 @@ import { exec } from "./cli/exec.js";
  * @returns void
  */
 const main = async () => {
-  exec();
+  await exec();
 };
 
 main();

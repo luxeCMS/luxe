@@ -6,5 +6,7 @@
     "luxecms": "0.0.1",
     "luxe-scripts": "0.0.1"
   },
-  "changesets": []
+  "changesets": [
+    "stale-crabs-clap"
+  ]
 }
