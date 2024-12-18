@@ -22,6 +22,7 @@ async function build(...args) {
   };
 
   const log = {
+    debug: (msg) => isVerbose && console.log(kleur.gray().dim("⚑ ") + msg),
     info: (msg) => console.log(kleur.blue().bold("¡ ") + msg),
     success: (msg) => console.log(kleur.green().bold("✓ ") + msg),
     warn: (msg) => console.log(kleur.yellow().bold("⚠ ") + msg),
