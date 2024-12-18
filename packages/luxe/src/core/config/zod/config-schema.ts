@@ -1,5 +1,21 @@
 import { z } from "zod";
 import { LuxeErrors } from "../../errors/index.js";
+import { loggerSchema } from "../../logger/zod/logger-schema.js";
+
+export const lifecycleHooksSchema = z.object({
+  "luxe:init": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .optional()
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHook("luxe:init")();
+    }),
+});
 
 export const moduleSchema = z.object({
   name: z
@@ -8,6 +24,7 @@ export const moduleSchema = z.object({
     .catch(() => {
       throw LuxeErrors.Config.MissingRequiredProperty("module", "name")();
     }),
+  hooks: lifecycleHooksSchema.optional(),
 });
 
 export const pluginSchema = z.object({

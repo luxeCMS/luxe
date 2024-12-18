@@ -158,7 +158,7 @@ export const loadLuxeConfigFile = async (
  * @returns the validated configuration object
  * @throws {LuxeError} if the configuration object is invalid
  */
-export const validateConfig = (config: LuxeUserConfig): LuxeUserConfig => {
+export const validateConfig = <T extends LuxeUserConfig>(config: T) => {
   const validatedConfig = configSchema.parse(config);
 
   if (!validatedConfig) {

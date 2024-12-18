@@ -1,9 +1,12 @@
+import type { z } from "zod";
+import type { lifecycleHooksSchema } from "../zod/config-schema.js";
+
 export type LuxeLifecycleHooks = {
   /**
    * Called at the start of the system lifecycle
    * @returns Promise<void>
    */
-  "luxe:init"?: (ctx: object) => void | Promise<void>;
+  "luxe:init"?: z.infer<typeof lifecycleHooksSchema>["luxe:init"];
 
   /**
    * Called before each module is loaded

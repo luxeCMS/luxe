@@ -1,4 +1,6 @@
 import type { ArgumentsCamelCase } from "yargs";
+import * as dotenv from "dotenv";
+import { resolve } from "node:path";
 import { loadLuxeConfigFile, validateConfig } from "../../core/config/index.js";
 import { LuxeError } from "../../core/errors/index.js";
 import { LuxeLog } from "../../core/logger/index.js";
@@ -8,6 +10,9 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
     level: argv.verbose ? "debug" : "info",
   });
   try {
+    // Load the .env file so users don't have to do it themselves
+    dotenv.config({ path: resolve(process.cwd(), ".env") });
+
     const config = await loadLuxeConfigFile();
     // We don't validate inside the `defineConfig` function because
     // not all users will use the `defineConfig` function,
@@ -17,8 +22,8 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
 
     // Load the core modules
     for (const module of validatedConfig.modules) {
-      if (module.hooks?.["luxe:module:start"]) {
-        await module.hooks["luxe:module:start"]({});
+      if (module.hooks?.["luxe:init"]) {
+        await module.hooks["luxe:init"]({ logger });
       }
     }
   } catch (error) {
