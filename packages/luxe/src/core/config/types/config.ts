@@ -12,49 +12,57 @@ export type LuxeLifecycleHooks = {
    * Called before each module is loaded
    * @returns Promise<void>
    */
-  "luxe:module:start"?: (ctx: object) => void | Promise<void>;
+  "luxe:module:start"?: z.infer<
+    typeof lifecycleHooksSchema
+  >["luxe:module:start"];
 
   /**
    * Called after each module is loaded
    * @returns Promise<void>
    */
-  "luxe:module:ready"?: (ctx: object) => void | Promise<void>;
+  "luxe:module:ready"?: z.infer<
+    typeof lifecycleHooksSchema
+  >["luxe:module:ready"];
 
   /**
    * Called after all modules are loaded
    * @returns Promise<void>
    */
-  "luxe:module:done"?: (ctx: object) => void | Promise<void>;
+  "luxe:module:done"?: z.infer<typeof lifecycleHooksSchema>["luxe:module:done"];
 
   /**
    * Called before each plugin is loaded
    * @returns Promise<void>
    */
-  "luxe:plugin:start"?: (ctx: object) => void | Promise<void>;
+  "luxe:plugin:start"?: z.infer<
+    typeof lifecycleHooksSchema
+  >["luxe:plugin:start"];
 
   /**
    * Called after each plugin is loaded
    * @returns Promise<void>
    */
-  "luxe:plugin:ready"?: (ctx: object) => void | Promise<void>;
+  "luxe:plugin:ready"?: z.infer<
+    typeof lifecycleHooksSchema
+  >["luxe:plugin:ready"];
 
   /**
    * Called after all plugins are loaded
    * @returns Promise<void>
    */
-  "luxe:plugin:done"?: (ctx: object) => void | Promise<void>;
+  "luxe:plugin:done"?: z.infer<typeof lifecycleHooksSchema>["luxe:plugin:done"];
 
   /**
    * Called when system is ready for operation
    * @returns Promise<void>
    */
-  "luxe:ready"?: (ctx: object) => void | Promise<void>;
+  "luxe:ready"?: z.infer<typeof lifecycleHooksSchema>["luxe:ready"];
 
   /**
    * Called when system is shutting down
    * @returns Promise<void>
    */
-  "luxe:cleanup"?: (ctx: object) => void | Promise<void>;
+  "luxe:cleanup"?: z.infer<typeof lifecycleHooksSchema>["luxe:cleanup"];
 };
 
 /**

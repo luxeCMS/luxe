@@ -9,6 +9,9 @@ export default defineConfig({
         "luxe:init": async (ctx) => {
           ctx.logger.info("Hello, world!");
         },
+        "luxe:cleanup": async (ctx) => {
+          ctx.logger.info("Goodbye, world!");
+        },
       },
     },
   ],

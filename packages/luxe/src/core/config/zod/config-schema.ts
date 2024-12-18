@@ -13,7 +13,111 @@ export const lifecycleHooksSchema = z.object({
     .returns(z.void().or(z.promise(z.void())))
     .optional()
     .catch(() => {
-      throw LuxeErrors.Config.InvalidHook("luxe:init")();
+      throw LuxeErrors.Config.InvalidHookFn("luxe:init")();
+    }),
+
+  "luxe:module:start": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .optional()
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHookFn("luxe:module:start")();
+    }),
+
+  "luxe:module:ready": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .optional()
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHookFn("luxe:module:ready")();
+    }),
+
+  "luxe:module:done": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .optional()
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHookFn("luxe:module:done")();
+    }),
+
+  "luxe:plugin:start": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .optional()
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHookFn("luxe:plugin:start")();
+    }),
+
+  "luxe:plugin:ready": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .optional()
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHookFn("luxe:plugin:ready")();
+    }),
+
+  "luxe:plugin:done": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .optional()
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHookFn("luxe:plugin:done")();
+    }),
+
+  "luxe:ready": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .optional()
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHookFn("luxe:ready")();
+    }),
+
+  "luxe:cleanup": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .optional()
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHookFn("luxe:cleanup")();
     }),
 });
 

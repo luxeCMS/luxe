@@ -389,15 +389,15 @@ export const LuxeErrors = {
     }),
 
     /**
-     * Use this error when a configuration file has an invalid hook.
+     * Use this error when a configuration file has an invalid hook function.
      * @param hook the name of the hook
      * @returns a LuxeError factory
      */
-    InvalidHook: (hook: string) =>
+    InvalidHookFn: (hook: string) =>
       LuxeError.create({
         code: "INVALID_HOOK",
-        message: `Invalid hook: ${hook}`,
-        hint: "Review the documentation for the available hooks and make sure you are using the correct hook name.",
+        message: `Invalid hook function for: ${hook}`,
+        hint: "Review the documentation for the available hooks and make sure you are defining the correct function for each hook.",
       }),
   },
 } as const;

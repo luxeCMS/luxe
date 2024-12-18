@@ -9,6 +9,8 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
   const logger = LuxeLog.instance({
     level: argv.verbose ? "debug" : "info",
   });
+
+  let validatedConfig: ReturnType<typeof validateConfig> | null = null;
   try {
     // Load the .env file so users don't have to do it themselves
     dotenv.config({ path: resolve(process.cwd(), ".env") });
@@ -17,7 +19,7 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
     // We don't validate inside the `defineConfig` function because
     // not all users will use the `defineConfig` function,
     // so we validate the config here.
-    const validatedConfig = validateConfig(config);
+    validatedConfig = validateConfig(config);
     logger.debug("Config loaded successfully");
 
     // Load the core modules
@@ -31,6 +33,14 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
       logger.error(error);
     } else {
       logger.error(error as Error);
+    }
+  } finally {
+    if (validatedConfig) {
+      for (const module of validatedConfig.modules) {
+        if (module.hooks?.["luxe:cleanup"]) {
+          await module.hooks["luxe:cleanup"]({ logger });
+        }
+      }
     }
   }
 };
