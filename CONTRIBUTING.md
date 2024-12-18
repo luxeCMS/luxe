@@ -2,8 +2,7 @@
 
 We welcome contributions of any size and skill level. Even documentation fixes for typos. As a truly open source project, we aim to build together with our community and are happy to provide guidance for first-time contributors.
 
-> [!Tip]
-> **New to open source?** Check out [First Contributions](https://github.com/firstcontributions/first-contributions) for a beginner-friendly guide.
+> [!Tip] > **New to open source?** Check out [First Contributions](https://github.com/firstcontributions/first-contributions) for a beginner-friendly guide.
 
 ## Quick Start
 
@@ -113,8 +112,8 @@ pnpm test
 
 ### Release Process
 
-When creating a pull request to `main`, you can control the release process using labels.
-A label **must** be added to your PR when merging a PR to `main`. The following labels are available:
+When creating a pull request to `release`, you can control the release process using labels.
+A label **must** be added to your PR when merging a PR to `release`. The following labels are available:
 
 - `release:stable` - Production release (npm tag: `latest`)
 
@@ -129,7 +128,7 @@ A label **must** be added to your PR when merging a PR to `main`. The following 
 **Release workflow**:
 
 1. Add the appropriate release label to your PR
-2. Once merged to `main`, the GitHub Action will:
+2. Once merged to `release`, the GitHub Action will:
    - Build all packages
    - Create new versions based on changesets
    - Publish to npm with appropriate tags
