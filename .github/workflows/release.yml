@@ -46,6 +46,12 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Setup .npmrc file
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+
       - name: Create Release and Publish
         id: changesets
         uses: changesets/action@v1
