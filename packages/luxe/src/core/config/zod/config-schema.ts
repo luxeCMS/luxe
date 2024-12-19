@@ -3,7 +3,7 @@ import { LuxeErrors } from "../../errors/index.js";
 import { loggerSchema } from "../../logger/zod/logger-schema.js";
 
 export const lifecycleHooksSchema = z.object({
-  "luxe:init": z
+  "luxe:migrate:before": z
     .function()
     .args(
       z.object({
@@ -13,10 +13,10 @@ export const lifecycleHooksSchema = z.object({
     .returns(z.void().or(z.promise(z.void())))
     .optional()
     .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:init")();
+      throw LuxeErrors.Config.InvalidHookFn("luxe:migrate:before")();
     }),
 
-  "luxe:module:start": z
+  "luxe:migrate:start": z
     .function()
     .args(
       z.object({
@@ -26,10 +26,10 @@ export const lifecycleHooksSchema = z.object({
     .returns(z.void().or(z.promise(z.void())))
     .optional()
     .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:module:start")();
+      throw LuxeErrors.Config.InvalidHookFn("luxe:migrate:start")();
     }),
 
-  "luxe:module:ready": z
+  "luxe:migrate:done": z
     .function()
     .args(
       z.object({
@@ -39,10 +39,10 @@ export const lifecycleHooksSchema = z.object({
     .returns(z.void().or(z.promise(z.void())))
     .optional()
     .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:module:ready")();
+      throw LuxeErrors.Config.InvalidHookFn("luxe:migrate:done")();
     }),
 
-  "luxe:module:done": z
+  "luxe:migrate:error": z
     .function()
     .args(
       z.object({
@@ -52,10 +52,10 @@ export const lifecycleHooksSchema = z.object({
     .returns(z.void().or(z.promise(z.void())))
     .optional()
     .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:module:done")();
+      throw LuxeErrors.Config.InvalidHookFn("luxe:migrate:error")();
     }),
 
-  "luxe:plugin:start": z
+  "luxe:server:before": z
     .function()
     .args(
       z.object({
@@ -65,10 +65,10 @@ export const lifecycleHooksSchema = z.object({
     .returns(z.void().or(z.promise(z.void())))
     .optional()
     .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:plugin:start")();
+      throw LuxeErrors.Config.InvalidHookFn("luxe:server:before")();
     }),
 
-  "luxe:plugin:ready": z
+  "luxe:server:start": z
     .function()
     .args(
       z.object({
@@ -78,10 +78,10 @@ export const lifecycleHooksSchema = z.object({
     .returns(z.void().or(z.promise(z.void())))
     .optional()
     .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:plugin:ready")();
+      throw LuxeErrors.Config.InvalidHookFn("luxe:server:start")();
     }),
 
-  "luxe:plugin:done": z
+  "luxe:server:shutdown": z
     .function()
     .args(
       z.object({
@@ -91,33 +91,7 @@ export const lifecycleHooksSchema = z.object({
     .returns(z.void().or(z.promise(z.void())))
     .optional()
     .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:plugin:done")();
-    }),
-
-  "luxe:ready": z
-    .function()
-    .args(
-      z.object({
-        logger: loggerSchema,
-      }),
-    )
-    .returns(z.void().or(z.promise(z.void())))
-    .optional()
-    .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:ready")();
-    }),
-
-  "luxe:cleanup": z
-    .function()
-    .args(
-      z.object({
-        logger: loggerSchema,
-      }),
-    )
-    .returns(z.void().or(z.promise(z.void())))
-    .optional()
-    .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:cleanup")();
+      throw LuxeErrors.Config.InvalidHookFn("luxe:server:shutdown")();
     }),
 });
 

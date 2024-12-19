@@ -268,6 +268,18 @@ export class LuxeError extends Error {
 }
 
 export const LuxeErrors = {
+  /**
+   * Use this error when a feature is not implemented.
+   * @param feature The feature that is not implemented
+   * @returns A LuxeError factory
+   */
+  NotImplemented: (feature: string) =>
+    LuxeError.create({
+      code: "NOT_IMPLEMENTED",
+      message: `Feature not implemented: ${feature}`,
+      hint: "Here's your chance to contribute to Luxe!",
+    }),
+
   Config: {
     /**
      * Use this error when the project root cannot be found.

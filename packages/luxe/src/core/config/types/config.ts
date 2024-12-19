@@ -1,68 +1,86 @@
 import type { z } from "zod";
 import type { lifecycleHooksSchema } from "../zod/config-schema.js";
 
+/*
+ * The reason we have a separate type for lifecycle hooks is so we can add comments to the types.
+ * If we just used the zod schema directly, we would not be able to add comments. The comments
+ * will help the user in understanding what each lifecycle hook does.
+ */
+
+/**
+ * These lifecycle hooks are executed during the lifecycle of the Luxe application.
+ *
+ * - The migration hooks are executed during the migration process by the CLI `migrate` command.
+ * - The server hooks are executed during the lifecycle of the core server by the CLI `dev` or `start` commands.
+ */
 export type LuxeLifecycleHooks = {
   /**
-   * Called at the start of the system lifecycle
-   * @returns Promise<void>
+   * Called before the migration process starts.
+   *
+   * Here you can perform any setup that is required before the migration process starts,
+   * such as creating tables or indexes.
    */
-  "luxe:init"?: z.infer<typeof lifecycleHooksSchema>["luxe:init"];
-
-  /**
-   * Called before each module is loaded
-   * @returns Promise<void>
-   */
-  "luxe:module:start"?: z.infer<
+  "luxe:migrate:before"?: z.infer<
     typeof lifecycleHooksSchema
-  >["luxe:module:start"];
+  >["luxe:migrate:before"];
 
   /**
-   * Called after each module is loaded
-   * @returns Promise<void>
+   * Called when the migration process starts.
+   *
+   * Here you can perform any operations that require a connection to the database,
+   * such as checking data integrity or performing manual migrations.
    */
-  "luxe:module:ready"?: z.infer<
+  "luxe:migrate:start"?: z.infer<
     typeof lifecycleHooksSchema
-  >["luxe:module:ready"];
+  >["luxe:migrate:start"];
 
   /**
-   * Called after all modules are loaded
-   * @returns Promise<void>
+   * Called when the migration process is complete.
+   *
+   * Here you can perform any cleanup operations that are required after a successful migration.
    */
-  "luxe:module:done"?: z.infer<typeof lifecycleHooksSchema>["luxe:module:done"];
-
-  /**
-   * Called before each plugin is loaded
-   * @returns Promise<void>
-   */
-  "luxe:plugin:start"?: z.infer<
+  "luxe:migrate:done"?: z.infer<
     typeof lifecycleHooksSchema
-  >["luxe:plugin:start"];
+  >["luxe:migrate:done"];
 
   /**
-   * Called after each plugin is loaded
-   * @returns Promise<void>
+   * Called when the migration process encounters an error.
+   *
+   * Here you can handle down migrations if an error occurs during the migration process.
    */
-  "luxe:plugin:ready"?: z.infer<
+  "luxe:migrate:error"?: z.infer<
     typeof lifecycleHooksSchema
-  >["luxe:plugin:ready"];
+  >["luxe:migrate:error"];
 
   /**
-   * Called after all plugins are loaded
-   * @returns Promise<void>
+   * Called before any modules or plugins are loaded but before the server starts.
+   *
+   * Here you can handle any setup that is required before the server starts,
+   * such as injecting routes, middleware, modify the Luxe config, etc.
    */
-  "luxe:plugin:done"?: z.infer<typeof lifecycleHooksSchema>["luxe:plugin:done"];
+  "luxe:server:before"?: z.infer<
+    typeof lifecycleHooksSchema
+  >["luxe:server:before"];
 
   /**
-   * Called when system is ready for operation
-   * @returns Promise<void>
+   * Called right after the server starts and runs all initial setup processes.
+   *
+   * Here you can perform any operations that require a running server,
+   * such as setting up websockets, starting background tasks, etc.
    */
-  "luxe:ready"?: z.infer<typeof lifecycleHooksSchema>["luxe:ready"];
+  "luxe:server:start"?: z.infer<
+    typeof lifecycleHooksSchema
+  >["luxe:server:start"];
 
   /**
-   * Called when system is shutting down
-   * @returns Promise<void>
+   * Called when the server is shutting down.
+   *
+   * Here you can perform any cleanup operations that are required before the server shuts down,
+   * such as closing connections, saving state, etc.
    */
-  "luxe:cleanup"?: z.infer<typeof lifecycleHooksSchema>["luxe:cleanup"];
+  "luxe:server:shutdown"?: z.infer<
+    typeof lifecycleHooksSchema
+  >["luxe:server:shutdown"];
 };
 
 /**
