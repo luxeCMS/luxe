@@ -6,10 +6,10 @@ export default defineConfig({
     {
       name: "HelloWorldModule",
       hooks: {
-        "luxe:init": async (ctx) => {
+        "luxe:server:start": async (ctx) => {
           ctx.logger.info("Hello, world!");
         },
-        "luxe:cleanup": async (ctx) => {
+        "luxe:server:shutdown": async (ctx) => {
           ctx.logger.info("Goodbye, world!");
         },
       },

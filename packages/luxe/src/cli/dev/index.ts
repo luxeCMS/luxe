@@ -2,7 +2,7 @@ import type { ArgumentsCamelCase } from "yargs";
 import * as dotenv from "dotenv";
 import { resolve } from "node:path";
 import { loadLuxeConfigFile, validateConfig } from "../../core/config/index.js";
-import { LuxeError } from "../../core/errors/index.js";
+import { LuxeError, LuxeErrors } from "../../core/errors/index.js";
 import { LuxeLog } from "../../core/logger/index.js";
 
 export const dev = async (argv: ArgumentsCamelCase<object>) => {
@@ -24,10 +24,12 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
 
     // Load the core modules
     for (const module of validatedConfig.modules) {
-      if (module.hooks?.["luxe:init"]) {
-        await module.hooks["luxe:init"]({ logger });
+      if (module.hooks?.["luxe:server:start"]) {
+        await module.hooks["luxe:server:start"]({ logger });
       }
     }
+
+    throw LuxeErrors.NotImplemented("dev")();
   } catch (error) {
     if (LuxeError.isError(error)) {
       logger.error(error);
@@ -37,8 +39,8 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
   } finally {
     if (validatedConfig) {
       for (const module of validatedConfig.modules) {
-        if (module.hooks?.["luxe:cleanup"]) {
-          await module.hooks["luxe:cleanup"]({ logger });
+        if (module.hooks?.["luxe:server:shutdown"]) {
+          await module.hooks["luxe:server:shutdown"]({ logger });
         }
       }
     }
