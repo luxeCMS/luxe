@@ -1,4 +1,4 @@
-import type { LuxeLifecycleHooks } from "../../lifecycle/types/index.js";
+import type { LuxeLifecycleHooks } from "../../core/lifecycle/types/index.js";
 
 export type Module = {
   /**

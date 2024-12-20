@@ -1,10 +1,10 @@
 import type { ArgumentsCamelCase } from "yargs";
-import type { validateConfig } from "../../core/config/index.js";
 import { LuxeError, LuxeErrors } from "../../core/errors/index.js";
 import { LuxeLog } from "../../core/logger/index.js";
+import type { validateConfig } from "../../core/config/validate.js";
 import { processLuxeConfigFile } from "../utils/index.js";
 
-export const dev = async (argv: ArgumentsCamelCase<object>) => {
+export const migrateCreate = async (argv: ArgumentsCamelCase) => {
   const logger = LuxeLog.instance({
     level: argv.verbose ? "debug" : "info",
   });
@@ -13,14 +13,13 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
   try {
     validatedConfig = await processLuxeConfigFile(logger);
 
-    // Load the core modules
     for (const module of validatedConfig.modules) {
-      if (module.hooks?.["luxe:server:start"]) {
-        await module.hooks["luxe:server:start"]({ logger });
+      if (module.hooks?.["luxe:migrate:before"]) {
+        await module.hooks["luxe:migrate:before"]({ logger });
       }
     }
 
-    throw LuxeErrors.NotImplemented("dev")();
+    throw LuxeErrors.NotImplemented("migrate create")();
   } catch (error) {
     if (LuxeError.isError(error)) {
       logger.error(error);
@@ -30,10 +29,18 @@ export const dev = async (argv: ArgumentsCamelCase<object>) => {
   } finally {
     if (validatedConfig) {
       for (const module of validatedConfig.modules) {
-        if (module.hooks?.["luxe:server:shutdown"]) {
-          await module.hooks["luxe:server:shutdown"]({ logger });
+        if (module.hooks?.["luxe:migrate:done"]) {
+          await module.hooks["luxe:migrate:done"]({ logger });
         }
       }
     }
   }
+};
+
+export const migrateUp = async (argv: ArgumentsCamelCase) => {
+  throw LuxeErrors.NotImplemented("migrate up")();
+};
+
+export const migrateDown = async (argv: ArgumentsCamelCase) => {
+  throw LuxeErrors.NotImplemented("migrate down")();
 };

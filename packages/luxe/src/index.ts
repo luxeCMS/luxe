@@ -5,5 +5,5 @@ import { type LuxeUserConfig, defineConfig } from "./core/index.js";
  * directly from the `luxe` package. This file should not contain any
  * implementation details, only exports.
  */
-
 export { defineConfig, type LuxeUserConfig };
+export * from "./modules/index.js";

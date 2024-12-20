@@ -1,5 +1,5 @@
-import type { Module } from "../../modules/types/index.js";
-import type { Plugin } from "../../plugins/types/index.js";
+import type { Module } from "../../../modules/types/index.js";
+import type { Plugin } from "../../../plugins/types/index.js";
 
 /**
  * The Luxe configuration object.

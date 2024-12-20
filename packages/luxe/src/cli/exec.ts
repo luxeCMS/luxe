@@ -1,6 +1,8 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { dev } from "./dev/index.js";
+import { LuxeErrors } from "../core/errors/index.js";
+import { migrateCreate, migrateDown, migrateUp } from "./migrate/index.js";
 
 /**
  * This is the real entry point of the CLI. It uses yargs to parse the
@@ -27,6 +29,52 @@ export const exec = () => {
         });
       },
       dev,
+    )
+    .command(
+      "migrate",
+      "Run database migrations",
+      (yargs) => {
+        yargs.command(
+          "create",
+          "Create a new migration",
+          (yargs) => {
+            yargs.option("name", {
+              alias: "n",
+              type: "string",
+              description: "The name of the migration",
+              demandOption: true,
+            });
+          },
+          migrateCreate,
+        );
+        yargs.command(
+          "up",
+          "Run all pending migrations",
+          (yargs) => {
+            yargs.option("count", {
+              alias: "c",
+              type: "number",
+              description: "The number of migrations to run",
+            });
+          },
+          migrateUp,
+        );
+        yargs.command(
+          "down",
+          "Rollback the last migration",
+          (yargs) => {
+            yargs.option("count", {
+              alias: "c",
+              type: "number",
+              description: "The number of migrations to rollback",
+            });
+          },
+          migrateDown,
+        );
+      },
+      () => {
+        console.error(LuxeErrors.CLI.SpecifyMigrateSubcommand().toString());
+      },
     )
     .parse();
 };

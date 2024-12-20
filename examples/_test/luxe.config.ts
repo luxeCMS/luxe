@@ -1,18 +1,7 @@
-import { defineConfig } from "luxecms";
+import { defineConfig, ObjectsModule } from "luxecms";
+import { schemas } from "./objects/schema.js";
 
 export default defineConfig({
   postgresUrl: process.env.POSTGRES_URL ?? "",
-  modules: [
-    {
-      name: "HelloWorldModule",
-      hooks: {
-        "luxe:server:start": async (ctx) => {
-          ctx.logger.info("Hello, world!");
-        },
-        "luxe:server:shutdown": async (ctx) => {
-          ctx.logger.info("Goodbye, world!");
-        },
-      },
-    },
-  ],
+  modules: [ObjectsModule({ schemas })],
 });
