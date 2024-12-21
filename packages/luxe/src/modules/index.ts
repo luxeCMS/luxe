@@ -1,2 +1,2 @@
 export * from "./types/index.js";
-export * from "./objects/index.js";
+export * from "./document/index.js";
