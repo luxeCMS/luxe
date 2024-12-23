@@ -12,7 +12,8 @@ export default defineConfig({
   modules: [
     DocumentModule({
       fields: [text(), number(), paragraph()],
-      documents: [address],
+      types: [address],
+      documents: [user],
     }),
     WidgetModule({
       renderer: "https://mysite.com/api/render",

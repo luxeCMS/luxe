@@ -1,23 +1,41 @@
-import { defineDocument, defineField } from "luxecms";
+import { defineDocument } from "luxecms";
 
 export const address = defineDocument({
   name: "address",
   fields: [
-    defineField({
+    defineText({
       name: "street",
-      type: "string",
+      validate: z.string().min(1).max(100),
     }),
-    defineField({
+    defineText({
       name: "city",
-      type: "string",
+      validate: z.string().min(1).max(100),
     }),
-    defineField({
+    defineText({
       name: "state",
-      type: "string",
+      validate: z.string().min(2).max(2),
     }),
-    defineField({
+    defineNumber({
       name: "zip",
-      type: "string",
+      validate: z.number().min(10000).max(99999),
+    }),
+  ],
+});
+
+export const document = defineDocument({
+  name: "user",
+  fields: [
+    defineText({
+      name: "name",
+      validate: z.string().min(1).max(100),
+    }),
+    defineText({
+      name: "email",
+      validate: z.string().email(),
+    }),
+    defineReference({
+      name: "address",
+      to: "address",
     }),
   ],
 });

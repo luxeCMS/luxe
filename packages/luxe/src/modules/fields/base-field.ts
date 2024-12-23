@@ -1,17 +1,69 @@
+import type { z } from "zod";
+import type {
+  varchar,
+  integer,
+  boolean,
+  date,
+  time,
+  timestamp,
+  jsonb,
+  smallint,
+  char,
+  bigint,
+  serial,
+  smallserial,
+  bigserial,
+} from "drizzle-orm/pg-core";
+
+type PostgresColumnType = ReturnType<
+  | typeof varchar
+  | typeof char
+  | typeof integer
+  | typeof smallint
+  | typeof bigint
+  | typeof serial
+  | typeof smallserial
+  | typeof bigserial
+  | typeof jsonb
+  | typeof boolean
+  | typeof date
+  | typeof time
+  | typeof timestamp
+>;
+
+export type FieldSchemaDefineProps<T> = {
+  name: string;
+  label: string;
+  defaultValue?: T | (() => T | Promise<T>);
+};
+
+export type FieldSchema<Name extends string, Type = unknown> = {
+  database: {
+    type: PostgresColumnType;
+  };
+} & {
+  [P in `define${Capitalize<Name>}`]: (
+    options: FieldSchemaDefineProps<Type>,
+  ) => FieldSchemaDefineProps<Type>;
+};
+
+export function createField<Name extends string, Type>(
+  create: () => () => FieldSchema<Name, Type>,
+): () => FieldSchema<Name, Type> {
+  return create();
+}
+
+// *********************************************************************************************************
+
 type ValidationError = {
   message: string;
   code?: string;
-  path?: string[];
+  path?: (string | number)[];
 };
 
-type FieldCondition<T = unknown, C = unknown> =
+type FieldCondition<C = unknown> =
   | boolean
-  | ((value: T, context: C) => boolean | Promise<boolean>);
-
-type ValidationFunction<T = unknown, C = unknown> = (
-  value: T,
-  context: C,
-) => ValidationError[] | Promise<ValidationError[]>;
+  | ((context: C) => boolean | Promise<boolean>);
 
 type DisplayOptions = {
   placeholder?: string;
@@ -23,59 +75,46 @@ type DisplayOptions = {
   className?: string;
 };
 
-type FieldHooks<T = unknown, C = unknown> = {
-  beforeValidate?: (value: T, context: C) => T | Promise<T>;
-  afterValidate?: (value: T, context: C) => T | Promise<T>;
-  beforeSave?: (value: T, context: C) => T | Promise<T>;
-  afterSave?: (value: T, context: C) => T | Promise<T>;
-  beforeLoad?: (value: T, context: C) => T | Promise<T>;
-  afterLoad?: (value: T, context: C) => T | Promise<T>;
-  onChange?: (value: T, context: C) => void | Promise<void>;
-};
-
 export interface BaseFieldConfig<T = unknown, C = unknown> {
   name: string;
   label: string;
   description?: string;
-  required?: boolean | FieldCondition<T, C>;
-  unique?: boolean | FieldCondition<T, C>;
-  defaultValue?: T | (() => T) | (() => Promise<T>);
-  hidden?: FieldCondition<T, C>;
-  readOnly?: FieldCondition<T, C>;
-  disabled?: FieldCondition<T, C>;
-  validate?: ValidationFunction<T, C> | ValidationFunction<T, C>[];
+  required?: boolean;
+  unique?: boolean;
+  defaultValue?: T | (() => T | Promise<T>);
+  hidden?: FieldCondition<C>;
+  readOnly?: FieldCondition<C>;
+  disabled?: FieldCondition<C>;
   transform?: (value: T) => T | Promise<T>;
-  sanitize?: (value: T) => T | Promise<T>;
   displayOptions?: DisplayOptions;
-  hooks?: FieldHooks<T, C>;
   permissions?: {
-    read?: FieldCondition<T, C>;
-    write?: FieldCondition<T, C>;
-    delete?: FieldCondition<T, C>;
+    read?: FieldCondition<C>;
+    write?: FieldCondition<C>;
+    delete?: FieldCondition<C>;
   };
 }
 
-export abstract class BaseField<T = unknown, C = unknown> {
+export abstract class BaseField<T, C = unknown> {
   readonly type: string;
   readonly name: string;
   readonly label: string;
   readonly description?: string;
 
-  #required: FieldCondition<T, C>;
-  #unique: FieldCondition<T, C>;
-  #hidden: FieldCondition<T, C>;
-  #readOnly: FieldCondition<T, C>;
-  #disabled: FieldCondition<T, C>;
-  #defaultValue?: T | (() => T) | (() => Promise<T>);
-  #validators: ValidationFunction<T, C>[];
+  abstract schema: z.ZodType<T>;
+
+  #required: FieldCondition<C>;
+  #unique: FieldCondition<C>;
+  #hidden: FieldCondition<C>;
+  #readOnly: FieldCondition<C>;
+  #disabled: FieldCondition<C>;
+  #defaultValue?: T | (() => T | Promise<T>);
   #transform?: (value: T) => T | Promise<T>;
-  #sanitize?: (value: T) => T | Promise<T>;
 
   readonly displayOptions: DisplayOptions;
-  readonly hooks: FieldHooks<T, C>;
   readonly permissions: {
-    read: FieldCondition<T, C>;
-    write: FieldCondition<T, C>;
+    read: FieldCondition<C>;
+    write: FieldCondition<C>;
+    delete: FieldCondition<C>;
   };
 
   protected constructor(config: BaseFieldConfig<T, C>) {
@@ -91,56 +130,48 @@ export abstract class BaseField<T = unknown, C = unknown> {
     this.#disabled = config.disabled ?? false;
     this.#defaultValue = config.defaultValue;
 
-    this.#validators = Array.isArray(config.validate)
-      ? config.validate
-      : config.validate
-      ? [config.validate]
-      : [];
-
     this.#transform = config.transform;
-    this.#sanitize = config.sanitize;
 
     this.displayOptions = {
-      ...config.displayOptions,
       width: "full",
       layout: "vertical",
+      ...config.displayOptions,
     };
-
-    this.hooks = config.hooks ?? {};
 
     this.permissions = {
       read: config.permissions?.read ?? true,
       write: config.permissions?.write ?? true,
+      delete: config.permissions?.delete ?? true,
     };
   }
 
   async isRequired(context: C): Promise<boolean> {
     return typeof this.#required === "function"
-      ? await this.#required(null as unknown as T, context)
+      ? await this.#required(context)
       : this.#required;
   }
 
   async isUnique(context: C): Promise<boolean> {
     return typeof this.#unique === "function"
-      ? await this.#unique(null as unknown as T, context)
+      ? await this.#unique(context)
       : this.#unique;
   }
 
   async isHidden(context: C): Promise<boolean> {
     return typeof this.#hidden === "function"
-      ? await this.#hidden(null as unknown as T, context)
+      ? await this.#hidden(context)
       : this.#hidden;
   }
 
   async isReadOnly(context: C): Promise<boolean> {
     return typeof this.#readOnly === "function"
-      ? await this.#readOnly(null as unknown as T, context)
+      ? await this.#readOnly(context)
       : this.#readOnly;
   }
 
   async isDisabled(context: C): Promise<boolean> {
     return typeof this.#disabled === "function"
-      ? await this.#disabled(null as unknown as T, context)
+      ? await this.#disabled(context)
       : this.#disabled;
   }
 
@@ -151,33 +182,28 @@ export abstract class BaseField<T = unknown, C = unknown> {
     return this.#defaultValue;
   }
 
-  async validate(value: T, context: C): Promise<ValidationError[]> {
-    let tempValue: T = value;
+  async validate(value: unknown, context: C): Promise<ValidationError[]> {
     try {
-      if (this.hooks.beforeValidate) {
-        tempValue = await this.hooks.beforeValidate(tempValue, context);
-      }
-
       const errors: ValidationError[] = [];
 
-      if (
-        (await this.isRequired(context)) &&
-        (tempValue === undefined || tempValue === null)
-      ) {
-        errors.push({
-          message: `${this.label} is required`,
-          code: "required",
-          path: [this.name],
-        });
+      if (await this.isRequired(context)) {
+        if (value === undefined || value === null) {
+          errors.push({
+            message: `${this.label} is required`,
+            code: "required",
+            path: [this.name],
+          });
+          return errors;
+        }
       }
 
-      for (const validator of this.#validators) {
-        const validationErrors = await validator(tempValue, context);
-        errors.push(...validationErrors);
-      }
-
-      if (this.hooks.afterValidate) {
-        tempValue = await this.hooks.afterValidate(tempValue, context);
+      const result = await this.schema.safeParseAsync(value);
+      if (!result.success) {
+        return result.error.errors.map((err) => ({
+          message: err.message,
+          code: err.code,
+          path: err.path.map(String),
+        }));
       }
 
       return errors;
@@ -199,13 +225,13 @@ export abstract class BaseField<T = unknown, C = unknown> {
     return value;
   }
 
-  async sanitizeValue(value: T): Promise<T> {
-    if (this.#sanitize) {
-      return await this.#sanitize(value);
-    }
-    return value;
+  serialize(value: T): unknown {
+    return this.schema.parse(value);
   }
 
-  abstract serialize(value: T): unknown;
-  abstract deserialize(value: unknown): T;
+  deserialize(value: unknown): T {
+    return this.schema.parse(value);
+  }
+
+  abstract render(value: T, context: C): Promise<unknown>;
 }
