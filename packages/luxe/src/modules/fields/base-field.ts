@@ -13,10 +13,12 @@ import type {
   serial,
   smallserial,
   bigserial,
+  text,
 } from "drizzle-orm/pg-core";
 
 type PostgresColumnType = ReturnType<
   | typeof varchar
+  | typeof text
   | typeof char
   | typeof integer
   | typeof smallint
@@ -41,6 +43,7 @@ export type FieldSchema<Name extends string, Type = unknown> = {
   database: {
     type: PostgresColumnType;
   };
+  component: string;
 } & {
   [P in `define${Capitalize<Name>}`]: (
     options: FieldSchemaDefineProps<Type>,
@@ -48,9 +51,10 @@ export type FieldSchema<Name extends string, Type = unknown> = {
 };
 
 export function createField<Name extends string, Type>(
-  create: () => () => FieldSchema<Name, Type>,
+  name: Name,
+  create: (name: Name) => () => FieldSchema<Name, Type>,
 ): () => FieldSchema<Name, Type> {
-  return create();
+  return create(name);
 }
 
 // *********************************************************************************************************
