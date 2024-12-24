@@ -12,16 +12,15 @@ export default defineConfig({
   modules: [
     DocumentModule({
       fields: [text(), number(), paragraph()],
-      types: [address],
       documents: [user],
     }),
     WidgetModule({
       renderer: "https://mysite.com/api/render",
-      widgetFolder: "widgets-react",
+      widgetFolder: "https://mysite.com/api/widgets-react",
     }),
     WidgetModule({
       renderer: "https://mysite.com/api/render",
-      widgetFolder: "widgets-vue",
+      widgetFolder: "https://mysite.com/api/widgets-vue",
     }),
     MediaModule({
       domain: "https://mysite.com",

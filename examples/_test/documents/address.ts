@@ -5,7 +5,7 @@ export const address = defineDocument({
   fields: [
     defineText({
       name: "street",
-      validate: z.string().min(1).max(100),
+      validate: z.string().min(1).max(500),
     }),
     defineText({
       name: "city",

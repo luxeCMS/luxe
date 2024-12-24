@@ -1,52 +1,61 @@
 {
-	"name": "luxecms",
-	"version": "0.0.2-beta.0",
-	"description": "The first truly composable headless CMS built for the modular web.",
-	"type": "module",
-	"scripts": {
-		"dev": "luxe-scripts dev --dts",
-		"build": "luxe-scripts build --dts",
-		"test": "vitest"
-	},
-	"exports": {
-		".": {
-			"types": "./dist/types/index.d.ts",
-			"import": "./dist/esm/index.mjs",
-			"require": "./dist/cjs/index.cjs"
-		}
-	},
-	"bin": {
-		"luxe": "./dist/esm/luxe.mjs"
-	},
-	"devDependencies": {
-		"@types/node": "^20.11.17",
-		"@types/pg": "^8.11.10",
-		"@types/stack-utils": "^2.0.3",
-		"@types/yargs": "^17.0.33",
-		"@vitest/coverage-v8": "^2.1.8",
-		"drizzle-kit": "^0.30.1",
-		"luxe-scripts": "workspace:*",
-		"tsup": "^8.0.2",
-		"tsx": "^4.19.2",
-		"vitest": "^2.1.8"
-	},
-	"dependencies": {
-		"@clack/prompts": "^0.8.2",
-		"@hono/node-server": "^1.13.7",
-		"cosmiconfig": "^9.0.0",
-		"dotenv": "^16.4.7",
-		"drizzle-orm": "^0.38.2",
-		"error-stack-parser": "^2.1.4",
-		"esbuild": "^0.24.0",
-		"hono": "^4.6.12",
-		"kleur": "^4.1.5",
-		"pg": "^8.13.1",
-		"stack-trace": "1.0.0-pre2",
-		"stack-utils": "^2.0.6",
-		"yargs": "^17.7.2",
-		"zod": "^3.23.8"
-	},
-	"publishConfig": {
-		"access": "public"
-	}
+  "name": "luxecms",
+  "version": "0.0.2-beta.0",
+  "description": "The first truly composable headless CMS built for the modular web.",
+  "type": "module",
+  "scripts": {
+    "dev": "luxe-scripts dev --dts",
+    "build": "luxe-scripts build --dts",
+    "test": "vitest"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs"
+    }
+  },
+  "bin": {
+    "luxe": "./dist/esm/luxe.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@types/pg": "^8.11.10",
+    "@types/stack-utils": "^2.0.3",
+    "@types/yargs": "^17.0.33",
+    "@vitest/coverage-v8": "^2.1.8",
+    "drizzle-kit": "^0.30.1",
+    "luxe-scripts": "workspace:*",
+    "tsup": "^8.0.2",
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.8.2",
+    "@hono/node-server": "^1.13.7",
+    "@solidjs/start": "^1.0.10",
+    "cosmiconfig": "^9.0.0",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.38.2",
+    "error-stack-parser": "^2.1.4",
+    "esbuild": "^0.24.0",
+    "hono": "^4.6.12",
+    "kleur": "^4.1.5",
+    "pg": "^8.13.1",
+    "solid-js": "^1.9.2",
+    "stack-trace": "1.0.0-pre2",
+    "stack-utils": "^2.0.6",
+    "vinxi": "^0.4.3",
+    "yargs": "^17.7.2",
+    "zod": "^3.23.8"
+  },
+  "overrides": {
+    "vite": "5.4.10"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
