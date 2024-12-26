@@ -4,8 +4,9 @@
   "description": "The first truly composable headless CMS built for the modular web.",
   "type": "module",
   "scripts": {
-    "dev": "luxe-scripts dev --dts",
-    "build": "luxe-scripts build --dts",
+    "dev": "luxe-scripts dev --dts --server",
+    "build": "luxe-scripts build --dts --server",
+    "start": "luxe-scripts start --server",
     "test": "vitest"
   },
   "exports": {

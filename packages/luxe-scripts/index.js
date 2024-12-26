@@ -9,6 +9,11 @@ export default async function run() {
       await build(...args, cmd === "dev" ? "--dev" : undefined);
       break;
     }
+    case "start": {
+      const { default: start } = await import("./cmd/start.js");
+      await start(...args);
+      break;
+    }
     default: {
       console.warn(
         "\n\n\n\n\n\n\npovertyCMS was real\n\n\n\n\n\n\nbtw, that's not a real command :)\n",
