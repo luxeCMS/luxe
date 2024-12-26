@@ -2,11 +2,13 @@ import * as esbuild from "esbuild";
 import { glob } from "glob";
 import kleur from "kleur";
 import { x } from "tinyexec";
+import path from "node:path";
 
 async function build(...args) {
   const isDev = args.includes("--dev");
   const isVerbose = args.includes("--verbose");
   const dts = args.includes("--dts");
+  const runServer = args.includes("--server");
   const entryPoints = await glob(["src/**/index.ts", "src/**/luxe.ts"], {
     absolute: true,
   });
@@ -110,6 +112,16 @@ async function build(...args) {
           }
         })(),
       ]);
+
+      if (runServer) {
+        try {
+          await x("vinxi", ["build"]);
+        } catch (error) {
+          log.error("Failed to build server");
+          log.error(error instanceof Error ? error.message : String(error));
+        }
+      }
+
       log.success("Build completed");
     }
   } catch (error) {

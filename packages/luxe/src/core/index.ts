@@ -1,31 +1,10 @@
-import type { LuxeUserConfig } from "./config/types/config.js";
+import type { validateConfig } from "./config/validate.js";
 
 /**
- * Defines a type-safe configuration for Luxe
- * @param config - The Luxe configuration object
- * @returns A type-safe, readonly configuration object
- * @public
- *
- * @example
- * ```typescript
- * const config = defineConfig({
- *   modules: [{
- *     name: 'core',
- *     hooks: {
- *       onInit: async () => {
- *         console.log('Initializing core module');
- *       }
- *     }
- *   }],
- *   plugins: [{
- *     id: 'my-plugin',
- *     version: '1.0.0'
- *   }]
- * });
- * ```
+ * If you want to expose the core functionality of Luxe, you can do so here.
+ * This file should only contain exports and no implementation details.
  */
-export function defineConfig(config: LuxeUserConfig): LuxeUserConfig {
-  return config;
-}
-
-export type { LuxeUserConfig };
+export { LuxeLog } from "./logger/index.js";
+export { LuxeError, LuxeErrors } from "./errors/index.js";
+export { processLuxeConfigFile } from "./config/index.js";
+export type LuxeConfig = ReturnType<typeof validateConfig>;

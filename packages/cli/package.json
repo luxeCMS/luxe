@@ -1,0 +1,22 @@
+{
+  "name": "@luxecms/cli",
+  "type": "module",
+  "bin": {
+    "luxe": "./dist/index.js"
+  },
+  "exports": {
+    "./cmd": {
+      "types": "./dist/cmd/index.d.ts",
+      "import": "./dist/cmd/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "luxe-scripts dev",
+    "build": "luxe-scripts build"
+  },
+  "dependencies": {
+    "citty": "^0.1.6",
+    "luxecms": "workspace:*",
+    "luxe-scripts": "workspace:*"
+  }
+}

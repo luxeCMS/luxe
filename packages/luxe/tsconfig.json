@@ -5,16 +5,6 @@
     "allowJs": true,
     "declarationDir": "./dist/types",
     "outDir": "./dist/types",
-    "jsx": "preserve",
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "jsxImportSource": "solid-js",
-    "strict": true,
-    "noEmit": true,
-    "types": ["vinxi/types/client"],
-    "isolatedModules": true
+    "jsx": "preserve"
   }
 }
