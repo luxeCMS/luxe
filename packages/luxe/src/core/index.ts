@@ -6,5 +6,5 @@ import type { validateConfig } from "./config/validate.js";
  */
 export { LuxeLog } from "./logger/index.js";
 export { LuxeError, LuxeErrors } from "./errors/index.js";
-export { processLuxeConfigFile } from "./config/index.js";
+export { processLuxeConfigFile, defineConfig } from "./config/index.js";
 export type LuxeConfig = ReturnType<typeof validateConfig>;
