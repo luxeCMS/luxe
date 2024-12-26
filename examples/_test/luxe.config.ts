@@ -1,18 +1,30 @@
-import { defineConfig } from "luxecms";
+import { defineConfig, ObjectsModule } from "luxecms";
+import {
+  DocumentModule,
+  WidgetModule,
+  MediaModule,
+  PageModule,
+} from "luxecms/modules";
+import { text, number, paragraph } from "luxecms/fields";
 
 export default defineConfig({
   postgresUrl: process.env.POSTGRES_URL ?? "",
   modules: [
-    {
-      name: "HelloWorldModule",
-      hooks: {
-        "luxe:server:start": async (ctx) => {
-          ctx.logger.info("Hello, world!");
-        },
-        "luxe:server:shutdown": async (ctx) => {
-          ctx.logger.info("Goodbye, world!");
-        },
-      },
-    },
+    DocumentModule({
+      fields: [text(), number(), paragraph()],
+      documents: [user],
+    }),
+    WidgetModule({
+      renderer: "https://mysite.com/api/render",
+      widgetFolder: "https://mysite.com/api/widgets-react",
+    }),
+    WidgetModule({
+      renderer: "https://mysite.com/api/render",
+      widgetFolder: "https://mysite.com/api/widgets-vue",
+    }),
+    MediaModule({
+      domain: "https://mysite.com",
+    }),
+    PageModule(),
   ],
 });

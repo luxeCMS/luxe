@@ -412,4 +412,50 @@ export const LuxeErrors = {
         hint: "Review the documentation for the available hooks and make sure you are defining the correct function for each hook.",
       }),
   },
+  CLI: {
+    /**
+     * Use this error when a command is not found.
+     * @param command the command that was not found
+     * @returns a LuxeError factory
+     */
+    CommandNotFound: (command: string) =>
+      LuxeError.create({
+        code: "COMMAND_NOT_FOUND",
+        message: `Command not found: ${command}`,
+        hint: "Make sure you are running a valid command.",
+      }),
+
+    /**
+     * Use this error when a command has an invalid argument.
+     * @param argument the invalid argument
+     * @returns a LuxeError factory
+     */
+    InvalidArgument: (argument: string) =>
+      LuxeError.create({
+        code: "INVALID_ARGUMENT",
+        message: `Invalid argument: ${argument}`,
+        hint: "Make sure you are passing valid arguments to the command.",
+      }),
+
+    /**
+     * Use this error when a command has an invalid option.
+     * @param option the invalid option
+     * @returns a LuxeError factory
+     */
+    InvalidOption: (option: string) =>
+      LuxeError.create({
+        code: "INVALID_OPTION",
+        message: `Invalid option: ${option}`,
+        hint: "Make sure you are passing valid options to the command.",
+      }),
+
+    /**
+     * Use this error when a command has an invalid subcommand.
+     */
+    SpecifyMigrateSubcommand: LuxeError.create({
+      code: "SPECIFY_MIGRATE_SUBCOMMAND",
+      message: "Specify a subcommand for the 'migrate' command",
+      hint: "Run 'luxe migrate --help' for more information on subcommands.",
+    }),
+  },
 } as const;
