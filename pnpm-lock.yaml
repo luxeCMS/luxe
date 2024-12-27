@@ -29,12 +29,16 @@ importers:
       citty:
         specifier: ^0.1.6
         version: 0.1.6
-      luxe-scripts:
-        specifier: workspace:*
-        version: link:../luxe-scripts
       luxecms:
         specifier: workspace:*
         version: link:../luxe
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.17
+        version: 20.17.10
+      luxe-scripts:
+        specifier: workspace:*
+        version: link:../luxe-scripts
 
   packages/create-luxe:
     dependencies:
