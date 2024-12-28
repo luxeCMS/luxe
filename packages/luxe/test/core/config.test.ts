@@ -5,8 +5,8 @@ import {
   buildTsConfig,
   findProjectRoot,
   importConfigFile,
-  loadLuxeConfigFile,
-} from "../../src/core/config/index.js";
+  parseLuxeConfigFileInDir,
+} from "../../src/core/config/validate.js";
 import { LuxeErrors } from "../../src/core/errors/index.js";
 
 /**
@@ -151,7 +151,7 @@ describe("loadLuxeConfigFile", () => {
     const configPath = (
       await getConfigPathFromFixture("config-not-found")
     ).replace("/luxe.config.ts", "");
-    await expect(loadLuxeConfigFile(configPath)).rejects.toStrictEqual(
+    await expect(parseLuxeConfigFileInDir(configPath)).rejects.toStrictEqual(
       LuxeErrors.Config.NoConfigFile(),
     );
   });
@@ -160,7 +160,7 @@ describe("loadLuxeConfigFile", () => {
     const configPath = (
       await getConfigPathFromFixture("ts-valid-config")
     ).replace("/luxe.config.ts", "");
-    const config = await loadLuxeConfigFile(configPath);
+    const config = await parseLuxeConfigFileInDir(configPath);
     expect(config).toBeDefined();
     expect(config).toBeTypeOf("object");
   });
@@ -169,7 +169,7 @@ describe("loadLuxeConfigFile", () => {
     const configPath = (
       await getConfigPathFromFixture("js-valid-config", "js")
     ).replace("/luxe.config.js", "");
-    const config = await loadLuxeConfigFile(configPath);
+    const config = await parseLuxeConfigFileInDir(configPath);
     expect(config).toBeDefined();
     expect(config).toBeTypeOf("object");
   });
@@ -178,23 +178,23 @@ describe("loadLuxeConfigFile", () => {
     const configPath = (
       await getConfigPathFromFixture("mjs-valid-config", "mjs")
     ).replace("/luxe.config.mjs", "");
-    const config = await loadLuxeConfigFile(configPath);
+    const config = await parseLuxeConfigFileInDir(configPath);
     expect(config).toBeDefined();
     expect(config).toBeTypeOf("object");
   });
 
   it("should throw NoRoot error when project root cannot be found", async () => {
     const nonExistentPath = "/path/that/does/not/exist";
-    await expect(loadLuxeConfigFile(nonExistentPath)).rejects.toStrictEqual(
-      LuxeErrors.Config.NoRoot(),
-    );
+    await expect(
+      parseLuxeConfigFileInDir(nonExistentPath),
+    ).rejects.toStrictEqual(LuxeErrors.Config.NoRoot());
   });
 
   it("should skip empty config files and continue searching", async () => {
     const configPath = (
       await getConfigPathFromFixture("config-not-found")
     ).replace("/luxe.config.ts", "");
-    await expect(loadLuxeConfigFile(configPath)).rejects.toStrictEqual(
+    await expect(parseLuxeConfigFileInDir(configPath)).rejects.toStrictEqual(
       LuxeErrors.Config.NoConfigFile(),
     );
   });
