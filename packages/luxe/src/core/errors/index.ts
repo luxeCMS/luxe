@@ -458,4 +458,68 @@ export const LuxeErrors = {
       hint: "Run 'luxe migrate --help' for more information on subcommands.",
     }),
   },
+  DB: {
+    /**
+     * Use this error when a database connection string does not have the username/host/port.
+     */
+    InvalidConnectionStr: LuxeError.create({
+      code: "INVALID_CONNECTION_STRING",
+      message: "Invalid database connection string",
+      hint: "Does your postgres URL have the correct format? (ie. postgres://username:password@host:port/database)",
+    }),
+
+    /**
+     * Use this error when a database connection string does not have a database name.
+     */
+    NoDatabase: LuxeError.create({
+      code: "NO_DATABASE",
+      message: "No database name found in connection string",
+      hint: "Make sure your postgres URL has a database name.",
+    }),
+
+    /**
+     * Use this error when there is no connection to the database.
+     */
+    NoConnection: LuxeError.create({
+      code: "NO_DB_CONNECTION",
+      message: "No connection to the database",
+      hint: "Make sure you are connected to the database before running queries.",
+    }),
+
+    /**
+     * Use this error when a connection to the database fails.
+     */
+    ConnectionFailed: LuxeError.create({
+      code: "DB_CONNECTION_FAILED",
+      message: "Failed to connect to the database",
+      hint: "Make sure the database URL is correct and the database server is running.",
+    }),
+
+    /**
+     * Use this error when the database does not exist.
+     */
+    DatabaseDoesNotExist: LuxeError.create({
+      code: "DB_DOES_NOT_EXIST",
+      message: "Database does not exist",
+      hint: "Make sure the database exists before connecting to it.",
+    }),
+
+    /**
+     * Use this error when creating the database fails.
+     */
+    FailedToCreateDatabase: LuxeError.create({
+      code: "FAILED_TO_CREATE_DB",
+      message: "Failed to create database",
+      hint: "Make sure the database does not already exist before trying to create it.",
+    }),
+
+    /**
+     * Use this error when the database already exists when trying to create it.
+     */
+    DatabaseAlreadyExists: LuxeError.create({
+      code: "DB_ALREADY_EXISTS",
+      message: "Database already exists",
+      hint: "Make sure the database does not already exist before trying to create it.",
+    }),
+  },
 } as const;

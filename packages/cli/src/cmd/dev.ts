@@ -6,6 +6,9 @@ import {
   loadEnvFile,
   parseLuxeConfigFileInDir,
   validateLuxeConfig,
+  initializeLuxeDatabase,
+  establishLuxeDatabaseConnection,
+  luxeQuery,
 } from "luxecms";
 
 export type DevCmdOptions = {
@@ -30,6 +33,9 @@ const dev = async (options: DevCmdOptions) => {
     // not all users will use the `defineConfig` function
     validatedConfig = validateLuxeConfig(parsedConfig);
 
+    // Initialize the database (but doesn't establish a connection)
+    await initializeLuxeDatabase(validatedConfig.postgresUrl);
+
     logger.debug("Loaded configuration successfully");
 
     for (const module of validatedConfig.modules) {
@@ -51,6 +57,8 @@ const dev = async (options: DevCmdOptions) => {
         });
       }
     }
+
+    establishLuxeDatabaseConnection(validatedConfig.postgresUrl);
 
     // Load the core modules
     for (const module of validatedConfig.modules) {

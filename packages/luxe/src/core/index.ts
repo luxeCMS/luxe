@@ -5,10 +5,16 @@ import type { validateLuxeConfig } from "./config/validate.js";
  * This file should only contain exports and no implementation details.
  */
 export { LuxeLog } from "./logger/index.js";
+export {
+  initializeLuxeDatabase,
+  establishLuxeDatabaseConnection,
+  luxeQuery,
+} from "./db/index.js";
 export { LuxeError, LuxeErrors } from "./errors/index.js";
 export {
   parseLuxeConfigFileInDir,
   loadEnvFile,
+  defineConfig,
   validateLuxeConfig,
 } from "./config/index.js";
 export type LuxeConfig = ReturnType<typeof validateLuxeConfig>;

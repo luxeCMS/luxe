@@ -4,12 +4,12 @@
   "description": "The first truly composable headless CMS built for the modular web.",
   "type": "module",
   "bin": {
-    "luxe": "./dist/index.js"
+    "luxe": "./dist/esm/index.mjs"
   },
   "exports": {
     "./cmd": {
       "types": "./dist/cmd/index.d.ts",
-      "import": "./dist/cmd/index.js"
+      "import": "./dist/esm/cmd/index.mjs"
     }
   },
   "scripts": {
