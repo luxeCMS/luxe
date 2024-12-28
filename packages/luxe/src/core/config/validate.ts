@@ -117,7 +117,7 @@ export const importConfigFile = async (
  * @returns the LuxeCoreConfig object
  * @throws {LuxeConfigError} if the configuration file is not found or invalid
  */
-export const loadLuxeConfigFile = async (
+export const parseLuxeConfigFileInDir = async (
   cwd = process.cwd(),
 ): Promise<LuxeUserConfig> => {
   const projectRoot = await findProjectRoot(cwd).catch((error) => {
@@ -158,7 +158,7 @@ export const loadLuxeConfigFile = async (
  * @returns the validated configuration object
  * @throws {LuxeError} if the configuration object is invalid
  */
-export const validateConfig = <T extends LuxeUserConfig>(config: T) => {
+export const validateLuxeConfig = <T extends LuxeUserConfig>(config: T) => {
   const validatedConfig = configSchema.parse(config);
 
   if (!validatedConfig) {

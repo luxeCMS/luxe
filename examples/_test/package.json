@@ -1,19 +1,16 @@
 {
-  "name": "hello-world",
+  "name": "test",
   "version": "1.0.0",
-  "description": "A simple hello world example",
   "type": "module",
+  "private": true,
   "scripts": {
     "dev": "luxe dev",
+    "build": "luxe build",
+    "start": "luxe start",
     "migrate": "luxe migrate"
   },
-  "keywords": [
-    "hello",
-    "world"
-  ],
-  "author": "Your Name",
-  "license": "MIT",
   "dependencies": {
+    "@luxecms/cli": "workspace:*",
     "luxecms": "workspace:*"
   }
 }

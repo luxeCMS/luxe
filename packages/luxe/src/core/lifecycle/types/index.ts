@@ -53,10 +53,19 @@ export type LuxeLifecycleHooks = {
   >["luxe:migrate:error"];
 
   /**
-   * Called before any modules or plugins are loaded but before the server starts.
+   * Called before modules and plugins are loaded and before the server starts.
    *
    * Here you can handle any setup that is required before the server starts,
-   * such as injecting routes, middleware, modify the Luxe config, etc.
+   * such as injecting routes, middleware, modifying the Luxe config, etc.
+   */
+  "luxe:server:init"?: z.infer<typeof lifecycleHooksSchema>["luxe:server:init"];
+
+  /**
+   * Called after all modules and plugins are loaded but before the server starts.
+   *
+   * Here you can handle any setup that is required before the server starts but
+   * after all modules and plugins are loaded. This is useful if you need to access
+   * the modules and plugins to perform setup operations that rely on other modules/plugins.
    */
   "luxe:server:before"?: z.infer<
     typeof lifecycleHooksSchema
@@ -68,9 +77,19 @@ export type LuxeLifecycleHooks = {
    * Here you can perform any operations that require a running server,
    * such as setting up websockets, starting background tasks, etc.
    */
-  "luxe:server:start"?: z.infer<
+  "luxe:server:ready"?: z.infer<
     typeof lifecycleHooksSchema
-  >["luxe:server:start"];
+  >["luxe:server:ready"];
+
+  /**
+   * Called when the server encounters an error.
+   *
+   * Here you can handle any errors that occur during the server's lifecycle.
+   * This is useful for logging errors, sending alerts, etc.
+   */
+  "luxe:server:error": z.infer<
+    typeof lifecycleHooksSchema
+  >["luxe:server:error"];
 
   /**
    * Called when the server is shutting down.
@@ -78,7 +97,7 @@ export type LuxeLifecycleHooks = {
    * Here you can perform any cleanup operations that are required before the server shuts down,
    * such as closing connections, saving state, etc.
    */
-  "luxe:server:shutdown"?: z.infer<
+  "luxe:server:close"?: z.infer<
     typeof lifecycleHooksSchema
-  >["luxe:server:shutdown"];
+  >["luxe:server:close"];
 };

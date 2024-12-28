@@ -1,6 +1,39 @@
 import { z } from "zod";
 import { LuxeErrors } from "../../errors/index.js";
 import { loggerSchema } from "../../logger/zod/logger-schema.js";
+import type postgres from "postgres";
+import type { luxeQuery } from "../../db/establish-db.js";
+
+const moduleSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .catch(() => {
+      throw LuxeErrors.Config.MissingRequiredProperty("module", "name")();
+    }),
+});
+
+const pluginSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .catch(() => {
+      throw LuxeErrors.Config.MissingRequiredProperty("plugin", "name")();
+    }),
+});
+
+const baseConfigSchema = z.object({
+  postgresUrl: z
+    .string()
+    .regex(
+      /(postgres(?:ql)?):\/\/(?:([^@\s]+)@)?([^\/\s]+)(?:\/(\w+))?(?:\?(.+))?/,
+    )
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidPostgresUrl();
+    }),
+  modules: z.array(moduleSchema),
+  plugins: z.array(pluginSchema).optional(),
+});
 
 export const lifecycleHooksSchema = z.object({
   "luxe:migrate:before": z
@@ -55,11 +88,26 @@ export const lifecycleHooksSchema = z.object({
       throw LuxeErrors.Config.InvalidHookFn("luxe:migrate:error")();
     }),
 
+  "luxe:server:init": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+        config: baseConfigSchema,
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .optional()
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHookFn("luxe:server:init")();
+    }),
+
   "luxe:server:before": z
     .function()
     .args(
       z.object({
         logger: loggerSchema,
+        luxeQuery: z.custom<typeof luxeQuery>(),
       }),
     )
     .returns(z.void().or(z.promise(z.void())))
@@ -68,7 +116,7 @@ export const lifecycleHooksSchema = z.object({
       throw LuxeErrors.Config.InvalidHookFn("luxe:server:before")();
     }),
 
-  "luxe:server:start": z
+  "luxe:server:ready": z
     .function()
     .args(
       z.object({
@@ -78,10 +126,23 @@ export const lifecycleHooksSchema = z.object({
     .returns(z.void().or(z.promise(z.void())))
     .optional()
     .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:server:start")();
+      throw LuxeErrors.Config.InvalidHookFn("luxe:server:ready")();
     }),
 
-  "luxe:server:shutdown": z
+  "luxe:server:error": z
+    .function()
+    .args(
+      z.object({
+        logger: loggerSchema,
+        error: z.any(),
+      }),
+    )
+    .returns(z.void().or(z.promise(z.void())))
+    .catch(() => {
+      throw LuxeErrors.Config.InvalidHookFn("luxe:server:error")();
+    }),
+
+  "luxe:server:close": z
     .function()
     .args(
       z.object({
@@ -91,50 +152,13 @@ export const lifecycleHooksSchema = z.object({
     .returns(z.void().or(z.promise(z.void())))
     .optional()
     .catch(() => {
-      throw LuxeErrors.Config.InvalidHookFn("luxe:server:shutdown")();
+      throw LuxeErrors.Config.InvalidHookFn("luxe:server:close")();
     }),
 });
 
-export const moduleSchema = z.object({
-  name: z
-    .string()
-    .min(1)
-    .catch(() => {
-      throw LuxeErrors.Config.MissingRequiredProperty("module", "name")();
-    }),
-  hooks: lifecycleHooksSchema.optional(),
+export const configSchema = baseConfigSchema.extend({
+  modules: z.array(moduleSchema.extend({ hooks: lifecycleHooksSchema })),
+  plugins: z
+    .array(pluginSchema.extend({ hooks: lifecycleHooksSchema }))
+    .optional(),
 });
-
-export const pluginSchema = z.object({
-  name: z
-    .string()
-    .min(1)
-    .catch(() => {
-      throw LuxeErrors.Config.MissingRequiredProperty("plugin", "name")();
-    }),
-});
-
-export const configSchema = z
-  .object({
-    postgresUrl: z
-      .string()
-      .regex(
-        /(postgres(?:ql)?):\/\/(?:([^@\s]+)@)?([^\/\s]+)(?:\/(\w+))?(?:\?(.+))?/,
-      )
-      .catch(() => {
-        throw LuxeErrors.Config.InvalidPostgresUrl();
-      }),
-    modules: z.array(moduleSchema).catch(() => {
-      throw LuxeErrors.Config.PropertyNotArray("modules")();
-    }),
-    plugins: z
-      .array(pluginSchema)
-      .optional()
-      .catch(() => {
-        throw LuxeErrors.Config.PropertyNotArray("plugins")();
-      }),
-  })
-  .nullable()
-  .catch(() => {
-    throw LuxeErrors.Config.Empty();
-  });

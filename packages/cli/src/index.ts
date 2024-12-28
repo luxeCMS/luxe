@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const packageJson = JSON.parse(
   fs.readFileSync(
-    fileURLToPath(new URL("../package.json", import.meta.url)),
+    fileURLToPath(new URL("../../package.json", import.meta.url)),
     "utf-8",
   ),
 );
@@ -49,7 +49,10 @@ const main = defineCommand({
       },
       async run({ args }) {
         const { dev } = await import("./cmd/index.js");
-        await dev(args);
+        await dev({
+          port: args.port ?? 5893,
+          verbose: args.verbose ?? false,
+        });
       },
     },
     build: {},
