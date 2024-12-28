@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { LuxeErrors } from "../../errors/index.js";
 import { loggerSchema } from "../../logger/zod/logger-schema.js";
+import type postgres from "postgres";
+import type { luxeQuery } from "../../db/establish-db.js";
 
 const moduleSchema = z.object({
   name: z
@@ -105,6 +107,7 @@ export const lifecycleHooksSchema = z.object({
     .args(
       z.object({
         logger: loggerSchema,
+        luxeQuery: z.custom<typeof luxeQuery>(),
       }),
     )
     .returns(z.void().or(z.promise(z.void())))

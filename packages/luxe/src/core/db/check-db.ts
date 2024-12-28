@@ -1,6 +1,5 @@
 import postgres from "postgres";
 import { LuxeErrors } from "../errors/index.js";
-import { LuxeLog } from "../logger/index.js";
 
 const POSTGRES_URL_PATTERN =
   /^postgres(?:ql)?:\/\/(?:([^:]*):?([^@]*)@)?([^\/:]+)(?::(\d+))?(?:\/([^?]+)?)?(?:\?(.*))?$/;
@@ -49,7 +48,6 @@ export const initializeLuxeDatabase = async (postgresUrl: string) => {
     await defaultDb`CREATE DATABASE ${defaultDb(database)}`;
     query = postgres(postgresUrl, { connect_timeout: 5 });
     await query`SELECT 1`;
-    LuxeLog.instance().debug("Database created successfully");
   } catch (error) {
     if (!(error instanceof postgres.PostgresError)) {
       throw LuxeErrors.DB.ConnectionFailed();

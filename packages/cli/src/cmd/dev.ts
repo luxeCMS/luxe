@@ -33,10 +33,12 @@ const dev = async (options: DevCmdOptions) => {
     // not all users will use the `defineConfig` function
     validatedConfig = validateLuxeConfig(parsedConfig);
 
+    logger.debug("Loaded configuration successfully");
+
     // Initialize the database (but doesn't establish a connection)
     await initializeLuxeDatabase(validatedConfig.postgresUrl);
 
-    logger.debug("Loaded configuration successfully");
+    logger.debug("Database initialized successfully");
 
     for (const module of validatedConfig.modules) {
       if (module.hooks?.["luxe:server:init"]) {
@@ -58,16 +60,18 @@ const dev = async (options: DevCmdOptions) => {
       }
     }
 
+    logger.debug("Initialized module `luxe:server:init` hooks successfully");
+
     establishLuxeDatabaseConnection(validatedConfig.postgresUrl);
 
     // Load the core modules
     for (const module of validatedConfig.modules) {
       if (module.hooks?.["luxe:server:before"]) {
-        await module.hooks["luxe:server:before"]({ logger });
+        await module.hooks["luxe:server:before"]({ logger, luxeQuery });
       }
     }
 
-    // TODO: loop through the plugins and run their `luxe:server:before` hooks
+    logger.debug("Initialized module `luxe:server:before` hooks successfully");
 
     throw LuxeErrors.NotImplemented("dev")();
   } catch (error) {
