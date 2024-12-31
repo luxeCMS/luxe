@@ -521,5 +521,14 @@ export const LuxeErrors = {
       message: "Database already exists",
       hint: "Make sure the database does not already exist before trying to create it.",
     }),
+
+    /**
+     * Use this error when creating the database fails.
+     */
+    DatabaseCreationFailed: LuxeError.create({
+      code: "DB_CREATION_FAILED",
+      message: "Failed to create database",
+      hint: "Does the user 'postgres' have permission to create databases?",
+    }),
   },
 } as const;

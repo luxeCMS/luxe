@@ -6,6 +6,12 @@
     "build": "vinxi build",
     "start": "vinxi start"
   },
+  "files": [
+    "package.json"
+  ],
+  "exports": {
+    "./package.json": "./package.json"
+  },
   "dependencies": {
     "@solidjs/start": "^1.0.10",
     "solid-js": "^1.9.2",

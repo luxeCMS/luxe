@@ -52,9 +52,8 @@ export const initializeLuxeDatabase = async (postgresUrl: string) => {
     if (!(error instanceof postgres.PostgresError)) {
       throw LuxeErrors.DB.ConnectionFailed();
     }
-
     if (error.message.includes("does not exist")) {
-      throw LuxeErrors.DB.NoDatabase();
+      throw LuxeErrors.DB.DatabaseCreationFailed();
     }
     throw LuxeErrors.DB.ConnectionFailed();
   } finally {

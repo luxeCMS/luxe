@@ -9,7 +9,7 @@ import {
   initializeLuxeDatabase,
   establishLuxeDatabaseConnection,
   luxeQuery,
-} from "luxecms";
+} from "../../../core/dist/types/index.js";
 
 export type DevCmdOptions = {
   port: number;
@@ -72,8 +72,6 @@ const dev = async (options: DevCmdOptions) => {
     }
 
     logger.debug("Initialized module `luxe:server:before` hooks successfully");
-
-    throw LuxeErrors.NotImplemented("dev")();
   } catch (error) {
     if (LuxeError.isError(error)) {
       logger.error(error);

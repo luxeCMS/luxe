@@ -72,7 +72,7 @@ export type LuxeLifecycleHooks = {
   >["luxe:server:before"];
 
   /**
-   * Called right after the server starts and runs all initial setup processes.
+   * Called right after the server starts and after all initial setup processes run.
    *
    * Here you can perform any operations that require a running server,
    * such as setting up websockets, starting background tasks, etc.
