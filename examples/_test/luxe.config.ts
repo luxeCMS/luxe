@@ -1,4 +1,4 @@
-import { defineConfig } from "../../packages/core/dist/types/index.js";
+import { defineConfig } from "@luxecms/core";
 
 export default defineConfig({
   postgresUrl: process.env.POSTGRES_URL ?? "",

@@ -1,6 +1,7 @@
+import path from "node:path";
+
 import {
   LuxeError,
-  LuxeErrors,
   LuxeLog,
   type LuxeConfig,
   loadEnvFile,
@@ -10,6 +11,9 @@ import {
   establishLuxeDatabaseConnection,
   luxeQuery,
 } from "@luxecms/core";
+import { defineConfig } from "@solidjs/start/config";
+import solid from "vite-plugin-solid";
+import { fileURLToPath } from "node:url";
 
 export type DevCmdOptions = {
   port: number;
@@ -72,6 +76,22 @@ const dev = async (options: DevCmdOptions) => {
     }
 
     logger.debug("Initialized module `luxe:server:before` hooks successfully");
+
+    try {
+      const app = defineConfig({
+        appRoot: path.join(
+          fileURLToPath(new URL("../../src/server", import.meta.url)),
+        ),
+        vite: {
+          plugins: [solid()],
+        },
+      });
+
+      // Run the dev server
+      await app.dev();
+    } catch (error) {
+      throw error;
+    }
   } catch (error) {
     if (LuxeError.isError(error)) {
       logger.error(error);

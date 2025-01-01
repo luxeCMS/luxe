@@ -12,7 +12,8 @@
   "files": [
     "package.json",
     "bin/luxe.js",
-    "dist"
+    "dist",
+    "src/server"
   ],
   "bin": {
     "luxe": "./bin/luxe.js"
@@ -27,7 +28,8 @@
     "@solidjs/start": "^1.0.10",
     "citty": "^0.1.6",
     "solid-js": "^1.9.2",
-    "vinxi": "^0.4.3"
+    "vinxi": "^0.4.3",
+    "vite-plugin-solid": "^2.11.0"
   },
   "devDependencies": {
     "luxe-scripts": "workspace:*"

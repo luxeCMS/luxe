@@ -24,6 +24,24 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
 
+  examples/_test:
+    dependencies:
+      '@luxecms/app':
+        specifier: workspace:*
+        version: link:../../packages/app
+      '@luxecms/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@solidjs/start':
+        specifier: ^1.0.10
+        version: 1.0.10(solid-js@1.9.3)(vinxi@0.4.3(@types/node@20.17.10)(db0@0.2.1(drizzle-orm@0.38.2(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5)))(drizzle-orm@0.38.2(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5))(ioredis@5.4.2)(terser@5.37.0)(typescript@5.7.2))(vite@6.0.6(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0))
+      solid-js:
+        specifier: ^1.9.2
+        version: 1.9.3
+      vinxi:
+        specifier: ^0.4.3
+        version: 0.4.3(@types/node@20.17.10)(db0@0.2.1(drizzle-orm@0.38.2(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5)))(drizzle-orm@0.38.2(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5))(ioredis@5.4.2)(terser@5.37.0)(typescript@5.7.2)
+
   packages/app:
     dependencies:
       '@luxecms/core':
@@ -41,23 +59,10 @@ importers:
       vinxi:
         specifier: ^0.4.3
         version: 0.4.3(@types/node@20.17.10)(db0@0.2.1(drizzle-orm@0.38.2(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5)))(drizzle-orm@0.38.2(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5))(ioredis@5.4.2)(terser@5.37.0)(typescript@5.7.2)
+      vite-plugin-solid:
+        specifier: ^2.11.0
+        version: 2.11.0(solid-js@1.9.3)(vite@6.0.6(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0))
     devDependencies:
-      luxe-scripts:
-        specifier: workspace:*
-        version: link:../luxe-scripts
-
-  packages/cli:
-    dependencies:
-      '@luxecms/core':
-        specifier: workspace:*
-        version: link:../core
-      citty:
-        specifier: ^0.1.6
-        version: 0.1.6
-    devDependencies:
-      '@types/node':
-        specifier: ^20.11.17
-        version: 20.17.10
       luxe-scripts:
         specifier: workspace:*
         version: link:../luxe-scripts

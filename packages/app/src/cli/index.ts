@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const packageJson = JSON.parse(
   fs.readFileSync(
-    fileURLToPath(new URL("../../../package.json", import.meta.url)),
+    fileURLToPath(new URL("../../package.json", import.meta.url)),
     "utf-8",
   ),
 );
