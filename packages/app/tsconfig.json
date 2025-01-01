@@ -1,4 +1,5 @@
 {
+  "include": ["src/server/**/*.ts"],
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
@@ -13,7 +14,7 @@
     "types": ["vinxi/types/client"],
     "isolatedModules": true,
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/server/*"]
     }
   }
 }

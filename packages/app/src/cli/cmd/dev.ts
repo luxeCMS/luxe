@@ -9,7 +9,7 @@ import {
   initializeLuxeDatabase,
   establishLuxeDatabaseConnection,
   luxeQuery,
-} from "../../../core/dist/types/index.js";
+} from "@luxecms/core";
 
 export type DevCmdOptions = {
   port: number;
