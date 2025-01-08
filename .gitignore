@@ -34,9 +34,5 @@ Thumbs.db
 # build
 build
 dist
-.solid
-.output
-.vercel
-.netlify
-.vinxi
+.astro/
 app.config.timestamp_*.js

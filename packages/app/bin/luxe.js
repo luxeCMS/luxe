@@ -10,7 +10,7 @@ if (requiredMajorVersion < minimumMajorVersion) {
   process.exit(1);
 }
 
-import("../dist/esm/index.mjs").catch((e) => {
+import("../../app_old/dist/esm/index.mjs").catch((e) => {
   console.error(e);
   process.exit(1);
 });

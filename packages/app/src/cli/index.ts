@@ -1,5 +1,5 @@
 import { defineCommand, runMain } from "citty";
-import fs from "node:fs";
+import * as fs from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const packageJson = JSON.parse(

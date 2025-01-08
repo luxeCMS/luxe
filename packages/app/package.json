@@ -3,41 +3,15 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "vinxi dev",
-    "build": "pnpm build:cli && pnpm build:server",
-    "start": "vinxi start",
+    "dev": "astro dev",
+    "build:client": "astro build",
     "build:cli": "luxe-scripts build --path=src/cli --tsconfig=tsconfig.cli.json",
-    "build:server": "vinxi build"
-  },
-  "files": [
-    "package.json",
-    "bin/luxe.js",
-    "dist",
-    "src/server"
-  ],
-  "bin": {
-    "luxe": "./bin/luxe.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/luxeCMS/luxe.git",
-    "directory": "packages/create-luxe"
+    "preview": "astro preview",
+    "astro": "astro"
   },
   "dependencies": {
     "@luxecms/core": "workspace:*",
-    "@solidjs/start": "^1.0.10",
-    "citty": "^0.1.6",
-    "solid-js": "^1.9.2",
-    "vinxi": "^0.4.3",
-    "vite-plugin-solid": "^2.11.0"
-  },
-  "devDependencies": {
-    "luxe-scripts": "workspace:*"
-  },
-  "overrides": {
-    "vite": "5.4.10"
-  },
-  "engines": {
-    "node": ">=18"
+    "astro": "^5.1.3",
+    "citty": "^0.1.6"
   }
 }
