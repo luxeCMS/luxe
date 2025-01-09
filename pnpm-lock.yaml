@@ -24,6 +24,15 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
 
+  examples/_test:
+    dependencies:
+      '@luxecms/app':
+        specifier: workspace:*
+        version: link:../../packages/app
+      '@luxecms/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
   packages/app:
     dependencies:
       '@luxecms/core':
@@ -35,6 +44,10 @@ importers:
       citty:
         specifier: ^0.1.6
         version: 0.1.6
+    devDependencies:
+      luxe-scripts:
+        specifier: workspace:*
+        version: link:../luxe-scripts
 
   packages/core:
     dependencies:

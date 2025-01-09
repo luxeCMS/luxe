@@ -1,5 +1,3 @@
-import path from "node:path";
-
 import {
   LuxeError,
   LuxeLog,
@@ -11,6 +9,7 @@ import {
   establishLuxeDatabaseConnection,
   luxeQuery,
 } from "@luxecms/core";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 export type DevCmdOptions = {
@@ -74,6 +73,25 @@ const dev = async (options: DevCmdOptions) => {
     }
 
     logger.debug("Initialized module `luxe:server:before` hooks successfully");
+
+    const { dev } = await import("astro");
+    try {
+      await dev({
+        srcDir: path.join(
+          fileURLToPath(new URL("../../src/astro", import.meta.url)),
+        ),
+        root: path.join(
+          fileURLToPath(new URL("../../src/astro", import.meta.url)),
+        ),
+        output: "server",
+        server: {
+          port: 5893,
+        },
+      });
+    } catch (error) {
+      logger.error(error as Error);
+      throw new Error("Failed to start Astro dev server");
+    }
   } catch (error) {
     if (LuxeError.isError(error)) {
       logger.error(error);
