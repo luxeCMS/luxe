@@ -8,13 +8,6 @@
 .idea/usage.statistics.xml
 .idea/shelf
 
-.solid
-.output
-.vercel
-.netlify
-.vinxi
-app.config.timestamp_*.js
-
 # deps
 node_modules/
 
@@ -33,10 +26,13 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+Thumbs.db
 
 # turbo
 .turbo
 
 # build
-build/
-dist/
+build
+dist
+.astro/
+app.config.timestamp_*.js

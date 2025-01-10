@@ -2,13 +2,21 @@ import * as esbuild from "esbuild";
 import { glob } from "glob";
 import kleur from "kleur";
 import { x } from "tinyexec";
-import path from "node:path";
 
 async function build(...args) {
   const isDev = args.includes("--dev");
   const isVerbose = args.includes("--verbose");
   const dts = args.includes("--dts");
   const runServer = args.includes("--server");
+  const joinedArgs = args.join(" ");
+  const path = /--path=[^ ]*/
+    .exec(joinedArgs)?.[0]
+    .trim()
+    .replace("--path=", "");
+  const tsconfig = /--tsconfig=[^ ]*/
+    .exec(joinedArgs)?.[0]
+    .trim()
+    .replace("--tsconfig=", "");
   const entryPoints = await glob(["src/**/index.ts", "src/**/luxe.ts"], {
     absolute: true,
   });
@@ -98,17 +106,28 @@ async function build(...args) {
           format: "esm",
           outdir: "dist/esm",
           outExtension: { ".js": ".mjs" },
+          ...(path ? { entryPoints: [`${path}/**/*.ts`] } : {}),
         }),
         esbuild.build({
           ...baseConfig,
           format: "cjs",
           outdir: "dist/cjs",
           outExtension: { ".js": ".cjs" },
+          ...(path ? { entryPoints: [`${path}/**/*.ts`] } : {}),
         }),
         (async () => {
           if (dts) {
             log.info("Generating type definitions");
-            await x("tsc", ["--emitDeclarationOnly", "--declaration"]);
+            if (tsconfig) {
+              await x("tsc", [
+                "--emitDeclarationOnly",
+                "--declaration",
+                "--project",
+                tsconfig,
+              ]);
+            } else {
+              await x("tsc", ["--emitDeclarationOnly", "--declaration"]);
+            }
           }
         })(),
       ]);

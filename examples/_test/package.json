@@ -10,7 +10,7 @@
     "migrate": "luxe migrate"
   },
   "dependencies": {
-    "@luxecms/cli": "workspace:*",
-    "luxecms": "workspace:*"
+    "@luxecms/app": "workspace:*",
+    "@luxecms/core": "workspace:*"
   }
 }
