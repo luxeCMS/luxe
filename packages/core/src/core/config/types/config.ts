@@ -1,5 +1,7 @@
-import type { Module } from "../../../modules/types/index.js";
-import type { Plugin } from "../../../plugins/types/index.js";
+import type { z } from "zod";
+import type { moduleSchema } from "../zod/config-schema.js";
+
+export type Module = z.infer<typeof moduleSchema>;
 
 /**
  * The Luxe configuration object.
@@ -18,12 +20,5 @@ export type LuxeUserConfig = {
    *
    * Choose what modules to load by adding them to this array.
    */
-  modules: Array<Module>;
-
-  /**
-   * The plugins that should be loaded by Luxe.
-   *
-   * Choose what plugins to load by adding them to this array.
-   */
-  plugins?: Array<Plugin>;
+  modules: Module;
 };

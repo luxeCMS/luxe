@@ -4,7 +4,7 @@ import { loggerSchema } from "../../logger/zod/logger-schema.js";
 import type postgres from "postgres";
 import type { luxeQuery } from "../../db/establish-db.js";
 
-const moduleSchema = z.object({
+const baseModuleSchema = z.object({
   name: z
     .string()
     .min(1)
@@ -13,7 +13,7 @@ const moduleSchema = z.object({
     }),
 });
 
-const pluginSchema = z.object({
+const basePluginSchema = z.object({
   name: z
     .string()
     .min(1)
@@ -31,8 +31,8 @@ const baseConfigSchema = z.object({
     .catch(() => {
       throw LuxeErrors.Config.InvalidPostgresUrl();
     }),
-  modules: z.array(moduleSchema),
-  plugins: z.array(pluginSchema).optional(),
+  modules: z.array(baseModuleSchema),
+  plugins: z.array(basePluginSchema).optional(),
 });
 
 export const lifecycleHooksSchema = z.object({
@@ -138,6 +138,7 @@ export const lifecycleHooksSchema = z.object({
       }),
     )
     .returns(z.void().or(z.promise(z.void())))
+    .optional()
     .catch(() => {
       throw LuxeErrors.Config.InvalidHookFn("luxe:server:error")();
     }),
@@ -156,9 +157,10 @@ export const lifecycleHooksSchema = z.object({
     }),
 });
 
+export const moduleSchema = baseModuleSchema.extend({
+  hooks: lifecycleHooksSchema,
+});
+
 export const configSchema = baseConfigSchema.extend({
-  modules: z.array(moduleSchema.extend({ hooks: lifecycleHooksSchema })),
-  plugins: z
-    .array(pluginSchema.extend({ hooks: lifecycleHooksSchema }))
-    .optional(),
+  modules: z.array(moduleSchema),
 });
