@@ -45,15 +45,11 @@ const dev = async (options: DevCmdOptions) => {
       if (module.hooks?.["luxe:server:init"]) {
         await module.hooks["luxe:server:init"]({
           logger,
-          // Pass in the config without the module/plugin hooks
+          // Pass in the config without the module hooks
           config: {
             ...validatedConfig,
             modules: validatedConfig.modules.map((m) => ({
               ...m,
-              hooks: undefined,
-            })),
-            plugins: validatedConfig.plugins?.map((p) => ({
-              ...p,
               hooks: undefined,
             })),
           },

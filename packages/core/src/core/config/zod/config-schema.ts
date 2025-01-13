@@ -13,15 +13,6 @@ const baseModuleSchema = z.object({
     }),
 });
 
-const basePluginSchema = z.object({
-  name: z
-    .string()
-    .min(1)
-    .catch(() => {
-      throw LuxeErrors.Config.MissingRequiredProperty("plugin", "name")();
-    }),
-});
-
 const baseConfigSchema = z.object({
   postgresUrl: z
     .string()
@@ -32,7 +23,6 @@ const baseConfigSchema = z.object({
       throw LuxeErrors.Config.InvalidPostgresUrl();
     }),
   modules: z.array(baseModuleSchema),
-  plugins: z.array(basePluginSchema).optional(),
 });
 
 export const lifecycleHooksSchema = z.object({
