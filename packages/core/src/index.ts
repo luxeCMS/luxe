@@ -4,4 +4,5 @@
  * implementation details, only exports.
  */
 export * from "./core/index.js";
+export * from "./server/index.js";
 export { z } from "zod";

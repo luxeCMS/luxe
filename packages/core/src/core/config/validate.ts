@@ -174,13 +174,5 @@ export const validateLuxeConfig = <T extends LuxeUserConfig>(config: T) => {
     moduleNames.add(module.name);
   }
 
-  const pluginNames = new Set<string>();
-  for (const plugin of validatedConfig?.plugins ?? []) {
-    if (pluginNames.has(plugin.name)) {
-      throw LuxeErrors.Config.DuplicateTypeName("plugin", plugin.name)();
-    }
-    pluginNames.add(plugin.name);
-  }
-
   return validatedConfig;
 };

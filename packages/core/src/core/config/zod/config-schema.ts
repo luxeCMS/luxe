@@ -3,6 +3,7 @@ import { LuxeErrors } from "../../errors/index.js";
 import { loggerSchema } from "../../logger/zod/logger-schema.js";
 import type postgres from "postgres";
 import type { luxeQuery } from "../../db/establish-db.js";
+import type { AstroUserConfig } from "astro";
 
 const baseModuleSchema = z.object({
   name: z
@@ -22,6 +23,9 @@ const baseConfigSchema = z.object({
     .catch(() => {
       throw LuxeErrors.Config.InvalidPostgresUrl();
     }),
+  astro: z
+    .custom<Omit<AstroUserConfig, "output" | "srcDir" | "root">>()
+    .optional(),
   modules: z.array(baseModuleSchema),
 });
 

@@ -8,9 +8,8 @@ import {
   initializeLuxeDatabase,
   establishLuxeDatabaseConnection,
   luxeQuery,
+  dev as luxeDev,
 } from "@luxecms/core";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 export type DevCmdOptions = {
   port: number;
@@ -45,7 +44,7 @@ const dev = async (options: DevCmdOptions) => {
       if (module.hooks?.["luxe:server:init"]) {
         await module.hooks["luxe:server:init"]({
           logger,
-          // Pass in the config without the module hooks
+          // Don't want users to alter the module hooks, so we exclude them
           config: {
             ...validatedConfig,
             modules: validatedConfig.modules.map((m) => ({
@@ -70,24 +69,7 @@ const dev = async (options: DevCmdOptions) => {
 
     logger.debug("Initialized module `luxe:server:before` hooks successfully");
 
-    const { dev } = await import("astro");
-    try {
-      await dev({
-        srcDir: path.join(
-          fileURLToPath(new URL("../../src/astro", import.meta.url)),
-        ),
-        root: path.join(
-          fileURLToPath(new URL("../../src/astro", import.meta.url)),
-        ),
-        output: "server",
-        server: {
-          port: 5893,
-        },
-      });
-    } catch (error) {
-      logger.error(error as Error);
-      throw new Error("Failed to start Astro dev server");
-    }
+    await luxeDev(validatedConfig);
   } catch (error) {
     if (LuxeError.isError(error)) {
       logger.error(error);

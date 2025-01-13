@@ -3,7 +3,7 @@ import { DocumentModule } from "@luxecms/core/modules";
 
 export default defineConfig({
   postgresUrl: process.env.POSTGRES_URL ?? "",
-  // astro: {},
+  astro: {},
   modules: [
     DocumentModule({
       schemas: {},
