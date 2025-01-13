@@ -1,4 +1,4 @@
-import type { Module } from "../types/index.js";
+import type { Module } from "../../core/config/types/config.js";
 import type {
   DocumentModuleProps,
   DocumentModuleSchema,
@@ -26,14 +26,20 @@ export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
         ctx.logger.info("Objects module migrate error hook!");
       },
 
+      "luxe:server:init": async (ctx) => {
+        ctx.logger.info("Objects module started!");
+      },
       "luxe:server:before": async (ctx) => {
         ctx.logger.info("Objects module server before hook!");
       },
-      "luxe:server:start": async (ctx) => {
+      "luxe:server:ready": async (ctx) => {
         ctx.logger.info("Objects module started!");
       },
-      "luxe:server:shutdown": async (ctx) => {
+      "luxe:server:close": async (ctx) => {
         ctx.logger.info("Objects module stopped!");
+      },
+      "luxe:server:error": async (ctx) => {
+        ctx.logger.info("Objects module error!");
       },
     },
   };

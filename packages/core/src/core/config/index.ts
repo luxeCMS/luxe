@@ -4,12 +4,16 @@ import type { LuxeUserConfig } from "./types/config.js";
 import type { z } from "zod";
 import type { configSchema } from "./zod/config-schema.js";
 
-export { validateLuxeConfig, parseLuxeConfigFileInDir } from "./validate.js";
+import { validateLuxeConfig, parseLuxeConfigFileInDir } from "./validate.js";
 
-export const loadEnvFile = (cwd = process.cwd()) => {
-  // Load the .env file so users don't have to do it themselves
-  // We use the .env file to read the environment variables. (eg. the POSTGRES_URL, PORT, etc.)
+export const resolveConfig = async (cwd = process.cwd()) => {
+  // Load the .env file first, as it may contain data
+  // that is required for the configuration file
   dotenv.config({ path: resolve(cwd, ".env") });
+  const config = await parseLuxeConfigFileInDir(cwd);
+  // We validate here instead of the `defineConfig` function because
+  // not all users will use the `defineConfig` function
+  return validateLuxeConfig(config);
 };
 
 /**
@@ -29,10 +33,6 @@ export const loadEnvFile = (cwd = process.cwd()) => {
  *       }
  *     }
  *   }],
- *   plugins: [{
- *     id: 'my-plugin',
- *     version: '1.0.0'
- *   }]
  * });
  * ```
  */
