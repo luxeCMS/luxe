@@ -12,4 +12,5 @@ export {
 } from "./db/index.js";
 export { LuxeError, LuxeErrors } from "./errors/index.js";
 export { resolveConfig, defineConfig } from "./config/index.js";
+export { dev } from "./cmd/index.js";
 export type LuxeConfig = ReturnType<typeof validateLuxeConfig>;

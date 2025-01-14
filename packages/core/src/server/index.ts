@@ -1,1 +1,1 @@
-export { dev } from "./astro/dev.js";
+export { astroDev } from "./astro/dev.js";
