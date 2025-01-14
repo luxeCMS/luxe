@@ -3,6 +3,12 @@
  * directly from the `luxe` package. This file should not contain any
  * implementation details, only exports.
  */
-export * from "./core/index.js";
-export * from "./server/index.js";
+export {
+  LuxeLog,
+  LuxeError,
+  resolveConfig,
+  defineConfig,
+  dev,
+  type LuxeConfig,
+} from "./core/index.js";
 export { z } from "zod";

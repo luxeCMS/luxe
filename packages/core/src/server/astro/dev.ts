@@ -1,18 +1,17 @@
-import { type AstroUserConfig, dev as astroDev } from "astro";
+import { dev } from "astro";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { LuxeError } from "../../core/errors/index.js";
 import type { LuxeConfig } from "../../core/index.js";
 
-export const dev = async (options: LuxeConfig) => {
+export const astroDev = async (
+  options: LuxeConfig,
+  rootPath: string,
+): ReturnType<typeof dev> => {
   try {
-    await astroDev({
-      srcDir: path.join(
-        fileURLToPath(new URL("../../src/astro", import.meta.url)),
-      ),
-      root: path.join(
-        fileURLToPath(new URL("../../src/astro", import.meta.url)),
-      ),
+    const devServer = await dev({
+      srcDir: path.join(fileURLToPath(new URL("../../src/astro", rootPath))),
+      root: path.join(fileURLToPath(new URL("../../src/astro", rootPath))),
       output: "server",
       server: {
         port: 5893,
@@ -23,6 +22,7 @@ export const dev = async (options: LuxeConfig) => {
         ),
       ),
     });
+    return devServer;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     throw new LuxeError({
