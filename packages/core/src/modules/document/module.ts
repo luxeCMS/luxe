@@ -10,18 +10,19 @@ import type {
  * @returns the core DocumentModule
  */
 export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
-  return defineModule(({ model }) => ({
-    name: "document",
+  return defineModule("document", ({ model }) => ({
     models: {
-      document: {
-        id: model.uuid(),
-        name: model.string(),
-        slug: model.string(),
-        createdAt: model.dateTime(),
-        updatedAt: model.dateTime(),
+      documents: {
+        id: model.uuid().primaryKey(),
+        schema_id: model.varchar(255),
+        slug: model.varchar(255),
+        created_at: model.timestamp(),
+        updated_at: model.timestamp(),
+        is_published: model.boolean(),
       },
-      documentVersion: {
-        id: model.uuid(),
+      document_versions: {
+        id: model.uuid().primaryKey(),
+        document_id: model.uuid().foreignKey("documents", "id"),
         documentId: model.uuid(),
         version: model.integer(),
         createdAt: model.dateTime(),
