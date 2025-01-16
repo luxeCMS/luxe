@@ -1,8 +1,6 @@
 import type { Module } from "../../core/config/types/config.js";
-import type {
-  DocumentModuleProps,
-  DocumentModuleSchema,
-} from "./types/index.js";
+import { defineModule, defineModel, field } from "../../core/index.js";
+import type { DocumentModuleProps } from "./types/index.js";
 
 /**
  * The core DocumentModule. This module is responsible for managing
@@ -10,25 +8,33 @@ import type {
  * @returns the core DocumentModule
  */
 export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
-  return defineModule("document", ({ model }) => ({
-    models: {
-      documents: {
-        id: model.uuid().primaryKey(),
-        schema_id: model.varchar(255),
-        slug: model.varchar(255),
-        created_at: model.timestamp(),
-        updated_at: model.timestamp(),
-        is_published: model.boolean(),
-      },
-      document_versions: {
-        id: model.uuid().primaryKey(),
-        document_id: model.uuid().foreignKey("documents", "id"),
-        documentId: model.uuid(),
-        version: model.integer(),
-        createdAt: model.dateTime(),
-        updatedAt: model.dateTime(),
-      },
-    },
+  return defineModule("document", () => ({
+    models: [
+      defineModel("documents", {
+        id: field.uuid().primaryKey(),
+        schema_id: field.varchar(255),
+        slug: field.varchar(255),
+        created_at: field.timestamp(),
+        updated_at: field.timestamp(),
+        is_published: field.boolean(),
+      }),
+      defineModel("document_versions", {
+        id: field.uuid().primaryKey(),
+        document_id: field.uuid().foreignKey("documents", "id"),
+        version_number: field.integer(),
+        data: field.jsonb(),
+        created_at: field.timestamp(),
+        updated_at: field.timestamp(),
+      }),
+      defineModel("document_references", {
+        id: field.uuid().primaryKey(),
+        document_id: field.uuid().foreignKey("documents", "id"),
+        reference_id: field.uuid().foreignKey("documents", "id"),
+        field_path: field.varchar(255),
+        created_at: field.timestamp(),
+        updated_at: field.timestamp(),
+      }),
+    ],
     hooks: {
       "luxe:migrate:before": async (ctx) => {
         ctx.logger.info("Objects module migrate before hook!");
