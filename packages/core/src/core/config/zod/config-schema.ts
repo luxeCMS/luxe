@@ -1,9 +1,12 @@
+import type { AddressInfo } from "node:net";
+import type http from "node:http";
 import { z } from "zod";
-import { LuxeErrors } from "../../errors/index.js";
+import { type LuxeError, LuxeErrors } from "../../errors/index.js";
 import { loggerSchema } from "../../logger/zod/logger-schema.js";
 import type postgres from "postgres";
 import type { luxeQuery } from "../../db/establish-db.js";
 import type { AstroUserConfig } from "astro";
+import type * as vite from "vite";
 
 const baseModuleSchema = z.object({
   name: z
@@ -115,6 +118,19 @@ export const lifecycleHooksSchema = z.object({
     .args(
       z.object({
         logger: loggerSchema,
+        // This is the dev server returned by the `dev` command, copied from the `astro` package
+        server: z.object({
+          address: z.custom<AddressInfo>(),
+          handle: z
+            .function()
+            .args(
+              z.custom<http.IncomingMessage>(),
+              z.custom<http.ServerResponse<http.IncomingMessage>>(),
+            )
+            .returns(z.void()),
+          watcher: z.custom<vite.FSWatcher>(),
+          stop: z.function().returns(z.promise(z.void())),
+        }),
       }),
     )
     .returns(z.void().or(z.promise(z.void())))
@@ -128,7 +144,7 @@ export const lifecycleHooksSchema = z.object({
     .args(
       z.object({
         logger: loggerSchema,
-        error: z.any(),
+        error: z.custom<LuxeError>(),
       }),
     )
     .returns(z.void().or(z.promise(z.void())))

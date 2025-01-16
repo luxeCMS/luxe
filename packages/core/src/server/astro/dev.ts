@@ -1,6 +1,4 @@
 import { dev } from "astro";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
 import { LuxeError } from "../../core/errors/index.js";
 import type { LuxeConfig } from "../../core/index.js";
 
@@ -10,8 +8,8 @@ export const astroDev = async (
 ): ReturnType<typeof dev> => {
   try {
     const devServer = await dev({
-      srcDir: path.join(fileURLToPath(new URL("../../src/astro", rootPath))),
-      root: path.join(fileURLToPath(new URL("../../src/astro", rootPath))),
+      srcDir: rootPath,
+      root: rootPath,
       output: "server",
       server: {
         port: 5893,

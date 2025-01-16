@@ -5,6 +5,8 @@ import {
   resolveConfig,
   dev as luxeDev,
 } from "@luxecms/core";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 export type DevCmdOptions = {
   port: number;
@@ -21,7 +23,12 @@ const dev = async (options: DevCmdOptions) => {
   try {
     config = await resolveConfig();
     logger.debug("Loaded configuration successfully");
-    devServer = await luxeDev(config, logger, "../../astro");
+
+    devServer = await luxeDev(
+      config,
+      logger,
+      path.join(fileURLToPath(new URL("../../src/astro", import.meta.url))),
+    );
   } catch (error) {
     if (devServer) {
       await devServer.close();

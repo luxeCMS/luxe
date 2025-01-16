@@ -10,8 +10,24 @@ import type {
  * @returns the core DocumentModule
  */
 export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
-  return {
-    name: "Core_DocumentModule",
+  return defineModule(({ model }) => ({
+    name: "document",
+    models: {
+      document: {
+        id: model.uuid(),
+        name: model.string(),
+        slug: model.string(),
+        createdAt: model.dateTime(),
+        updatedAt: model.dateTime(),
+      },
+      documentVersion: {
+        id: model.uuid(),
+        documentId: model.uuid(),
+        version: model.integer(),
+        createdAt: model.dateTime(),
+        updatedAt: model.dateTime(),
+      },
+    },
     hooks: {
       "luxe:migrate:before": async (ctx) => {
         ctx.logger.info("Objects module migrate before hook!");
@@ -42,5 +58,5 @@ export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
         ctx.logger.info("Objects module error!");
       },
     },
-  };
+  }));
 };

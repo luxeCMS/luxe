@@ -6,6 +6,15 @@ import type { configSchema } from "./zod/config-schema.js";
 
 import { validateLuxeConfig, parseLuxeConfigFileInDir } from "./validate.js";
 
+/**
+ * Resolves the Luxe configuration object. This function loads the .env file
+ * first, as it may contain data that is required for the configuration file.
+ * It then parses the configuration file and validates it.
+ *
+ * @param cwd the current working directory (default: process.cwd())
+ * @returns the resolved Luxe configuration object
+ * @throws {LuxeError} if the configuration file is not found or invalid
+ */
 export const resolveConfig = async (cwd = process.cwd()) => {
   // Load the .env file first, as it may contain data
   // that is required for the configuration file

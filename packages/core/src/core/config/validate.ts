@@ -115,7 +115,7 @@ export const importConfigFile = async (
  * Read the Luxe configuration file from the root of the project.
  * @param cwd the current working directory (default: process.cwd())
  * @returns the LuxeCoreConfig object
- * @throws {LuxeConfigError} if the configuration file is not found or invalid
+ * @throws {LuxeError} if the configuration file is not found or invalid
  */
 export const parseLuxeConfigFileInDir = async (
   cwd = process.cwd(),

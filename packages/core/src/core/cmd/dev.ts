@@ -46,6 +46,12 @@ export const dev = async (
 
   const devServer = await astroDev(config, astroProjectRoot);
 
+  for (const module of config.modules) {
+    if (module.hooks?.["luxe:server:ready"]) {
+      await module.hooks["luxe:server:ready"]({ logger, server: devServer });
+    }
+  }
+
   return {
     close: async () => {
       for (const module of config.modules) {
