@@ -1,8 +1,8 @@
 import { resolve } from "node:path";
 import * as dotenv from "dotenv";
 
-import { validateLuxeConfig, parseLuxeConfigFileInDir } from "./validate.js";
 import type { LuxeUserConfig } from "../../types/index.js";
+import { parseLuxeConfigFileInDir, validateLuxeConfig } from "./validate.js";
 
 /**
  * Resolves the Luxe configuration object. This function loads the .env file

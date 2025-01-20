@@ -1,8 +1,10 @@
-import type { AddressInfo } from "node:net";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { AddressInfo } from "node:net";
 import type { FSWatcher } from "vite";
-import type { LuxeConfig } from "../config/index.js";
 import type { LuxeError, LuxeLog, luxeQuery } from "../../../core/index.js";
+import type { LuxeConfig } from "../config/index.js";
+import type { Model } from "../models/index.js";
+import type { PgColumn, PgTableWithColumns } from "drizzle-orm/pg-core";
 
 /*
  * The reason we have a type for Module and a Zod type is so we can add comments to the types.
@@ -14,6 +16,39 @@ export type Module = {
    * The unique name of the module.
    */
   name: string;
+
+  /**
+   * The models that should be constructed for the module.
+   *
+   * Models represent the database tables and the
+   * fields represent the columns in the tables.
+   */
+  models?: PgTableWithColumns<{
+    name: string;
+    schema: string | undefined;
+    dialect: "pg";
+    columns: {
+      [x: string]: PgColumn<
+        {
+          name: string;
+          tableName: string;
+          dataType: "string" | "number" | "boolean" | "json" | "date";
+          generated: undefined;
+          notNull: boolean;
+          isPrimaryKey: boolean;
+          isAutoincrement: boolean;
+          hasDefault: boolean;
+          hasRuntimeDefault: boolean;
+          columnType: string;
+          data: unknown;
+          driverParam: unknown;
+          enumValues: string[] | undefined;
+        },
+        object,
+        object
+      >;
+    };
+  }>[];
 
   /**
    * These lifecycle hooks are executed during the lifecycle of the Luxe application.

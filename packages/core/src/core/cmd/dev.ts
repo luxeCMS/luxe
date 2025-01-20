@@ -1,11 +1,11 @@
-import {
-  establishLuxeDatabaseConnection,
-  initializeLuxeDatabase,
-  type LuxeLog,
-  luxeQuery,
-} from "../index.js";
 import { astroDev } from "../../server/index.js";
 import type { LuxeConfig } from "../../types/index.js";
+import {
+  type LuxeLog,
+  establishLuxeDatabaseConnection,
+  initializeLuxeDatabase,
+  luxeQuery,
+} from "../index.js";
 
 export const dev = async (config: LuxeConfig, logger: LuxeLog) => {
   // this doesn't establish a usable connection

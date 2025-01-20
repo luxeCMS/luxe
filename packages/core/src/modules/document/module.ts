@@ -1,6 +1,33 @@
+import { defineModel, defineModule, field } from "../../core/index.js";
 import type { Module } from "../../types/index.js";
-import { defineModule, defineModel, field } from "../../core/index.js";
-import type { DocumentModuleProps } from "./types/index.js";
+import type { DocumentModuleProps } from "../../zod/modules/documents/index.js";
+
+const documentModel = defineModel("documents", {
+  id: field.uuid().primaryKey(),
+  schema_id: field.varchar(255),
+  slug: field.varchar(255),
+  created_at: field.timestamp(),
+  updated_at: field.timestamp(),
+  is_published: field.boolean(),
+});
+
+const documentVersionModel = defineModel("document_versions", {
+  id: field.uuid().primaryKey(),
+  document_id: field.uuid().references(() => documentModel.fields),
+  version_number: field.integer(),
+  data: field.jsonb(),
+  created_at: field.timestamp(),
+  updated_at: field.timestamp(),
+});
+
+const documentReferenceModel = defineModel("document_references", {
+  id: field.uuid().primaryKey(),
+  document_id: field.uuid().references(() => documentModel.id),
+  reference_id: field.uuid().references(() => documentModel.id),
+  field_path: field.varchar(255),
+  created_at: field.timestamp(),
+  updated_at: field.timestamp(),
+});
 
 /**
  * The core DocumentModule. This module is responsible for managing
@@ -8,35 +35,10 @@ import type { DocumentModuleProps } from "./types/index.js";
  * @returns the core DocumentModule
  */
 export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
-  return defineModule("document", () => ({
+  return defineModule("document", {
     // Models represent the database tables and the
     // fields represent the columns in the tables
-    models: [
-      defineModel("documents", {
-        id: field.uuid().primaryKey(),
-        schema_id: field.varchar(255),
-        slug: field.varchar(255),
-        created_at: field.timestamp(),
-        updated_at: field.timestamp(),
-        is_published: field.boolean(),
-      }),
-      defineModel("document_versions", {
-        id: field.uuid().primaryKey(),
-        document_id: field.uuid().foreignKey("documents", "id"),
-        version_number: field.integer(),
-        data: field.jsonb(),
-        created_at: field.timestamp(),
-        updated_at: field.timestamp(),
-      }),
-      defineModel("document_references", {
-        id: field.uuid().primaryKey(),
-        document_id: field.uuid().foreignKey("documents", "id"),
-        reference_id: field.uuid().foreignKey("documents", "id"),
-        field_path: field.varchar(255),
-        created_at: field.timestamp(),
-        updated_at: field.timestamp(),
-      }),
-    ],
+    models: [documentModel, documentVersionModel, documentReferenceModel],
 
     hooks: {
       "luxe:migrate:before": async (ctx) => {
@@ -54,14 +56,14 @@ export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
 
       "luxe:server:init": async (ctx) => {
         ctx.logger.info("Document module started!");
-        ctx.routes.push({
-          method: "GET",
-          path: "/documents",
-          handler: async (req, res) => {
-            const documents = await ctx.db.query(`SELECT * FROM documents;`);
-            res.status(200).json(documents);
-          },
-        });
+        // ctx.routes.push({
+        //   method: "GET",
+        //   path: "/documents",
+        //   handler: async (req, res) => {
+        //     const documents = await ctx.db.query(`SELECT * FROM documents;`);
+        //     res.status(200).json(documents);
+        //   },
+        // });
       },
       "luxe:server:before": async (ctx) => {
         ctx.logger.info("Document module server before hook!");
@@ -76,5 +78,5 @@ export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
         ctx.logger.info("Document module error!");
       },
     },
-  }));
+  });
 };

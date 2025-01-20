@@ -24,15 +24,6 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
 
-  examples/_test:
-    dependencies:
-      '@luxecms/app':
-        specifier: workspace:*
-        version: link:../../packages/app
-      '@luxecms/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-
   packages/app:
     dependencies:
       '@luxecms/core':

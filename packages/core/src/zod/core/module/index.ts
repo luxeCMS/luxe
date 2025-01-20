@@ -1,14 +1,14 @@
-import { z } from "zod";
 import type http from "node:http";
+import type { AddressInfo } from "node:net";
 import type * as vite from "vite";
+import { z } from "zod";
 import {
   type LuxeError,
   LuxeErrors,
   type luxeQuery,
 } from "../../../core/index.js";
-import { loggerSchema } from "../logger/index.js";
 import { baseConfigSchema } from "../config/index.js";
-import type { AddressInfo } from "node:net";
+import { loggerSchema } from "../logger/index.js";
 
 export const baseModuleSchema = z.object({
   name: z
@@ -91,7 +91,7 @@ export const lifecycleHooksSchema = z.object({
     .args(
       z.object({
         logger: loggerSchema,
-        luxeQuery: z.custom<typeof luxeQuery>(),
+        query: z.custom<typeof luxeQuery>(),
       }),
     )
     .returns(z.void().or(z.promise(z.void())))

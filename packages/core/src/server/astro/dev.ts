@@ -1,6 +1,6 @@
 import { dev } from "astro";
 import { LuxeError } from "../../core/errors/index.js";
-import type { LuxeConfig } from "../../core/index.js";
+import type { LuxeConfig } from "../../types/index.js";
 
 export const astroDev = async (
   astroConfig: LuxeConfig["astro"],

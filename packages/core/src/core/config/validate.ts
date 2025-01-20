@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { LuxeError, LuxeErrors } from "../errors/index.js";
-import type { LuxeUserConfig } from "../../types/index.js";
+import type { LuxeConfig, LuxeUserConfig } from "../../types/index.js";
 import { configSchema } from "../../zod/core/config/index.js";
+import { LuxeError, LuxeErrors } from "../errors/index.js";
 
 /**
  * Find the root of the project by searching up for a package.json file.
@@ -158,7 +158,9 @@ export const parseLuxeConfigFileInDir = async (
  * @returns the validated configuration object
  * @throws {LuxeError} if the configuration object is invalid
  */
-export const validateLuxeConfig = <T extends LuxeUserConfig>(config: T) => {
+export const validateLuxeConfig = <T extends LuxeUserConfig>(
+  config: T,
+): LuxeConfig => {
   const validatedConfig = configSchema.parse(config);
 
   if (!validatedConfig) {
@@ -174,5 +176,5 @@ export const validateLuxeConfig = <T extends LuxeUserConfig>(config: T) => {
     moduleNames.add(module.name);
   }
 
-  return validatedConfig;
+  return { ...validatedConfig, astro: validatedConfig.astro ?? {} };
 };

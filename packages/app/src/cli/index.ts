@@ -1,6 +1,6 @@
-import { defineCommand, runMain } from "citty";
 import * as fs from "node:fs";
 import { fileURLToPath } from "node:url";
+import { defineCommand, runMain } from "citty";
 
 const packageJson = JSON.parse(
   fs.readFileSync(

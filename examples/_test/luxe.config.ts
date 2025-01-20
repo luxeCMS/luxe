@@ -1,4 +1,4 @@
-import { defineConfig, z } from "@luxecms/core";
+import { defineConfig } from "@luxecms/core";
 import { DocumentModule } from "@luxecms/core/modules";
 
 export default defineConfig({

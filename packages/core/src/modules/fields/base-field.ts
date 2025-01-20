@@ -1,20 +1,20 @@
-import type { z } from "zod";
 import type {
-  varchar,
-  integer,
+  bigint,
+  bigserial,
   boolean,
+  char,
   date,
+  integer,
+  jsonb,
+  serial,
+  smallint,
+  smallserial,
+  text,
   time,
   timestamp,
-  jsonb,
-  smallint,
-  char,
-  bigint,
-  serial,
-  smallserial,
-  bigserial,
-  text,
+  varchar,
 } from "drizzle-orm/pg-core";
+import type { z } from "zod";
 
 type PostgresColumnType = ReturnType<
   | typeof varchar

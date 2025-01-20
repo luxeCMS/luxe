@@ -1,6 +1,6 @@
+import { varchar } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { createField } from "../base-field.js";
-import { varchar } from "drizzle-orm/pg-core";
 
 export const text = createField<"text", string>("text", (typeName) => {
   let columnName: string;

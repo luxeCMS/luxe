@@ -1,6 +1,6 @@
-import { z } from "zod";
-import type postgres from "postgres";
 import type { AstroUserConfig } from "astro";
+import type postgres from "postgres";
+import { z } from "zod";
 import { LuxeErrors } from "../../../core/index.js";
 import { baseModuleSchema, moduleSchema } from "../module/index.js";
 
