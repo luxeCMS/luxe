@@ -1,35 +1,22 @@
-import type { AddressInfo } from "node:net";
-import type http from "node:http";
 import { z } from "zod";
-import { type LuxeError, LuxeErrors } from "../../errors/index.js";
-import { loggerSchema } from "../../logger/zod/logger-schema.js";
-import type postgres from "postgres";
-import type { luxeQuery } from "../../db/establish-db.js";
-import type { AstroUserConfig } from "astro";
+import type http from "node:http";
 import type * as vite from "vite";
+import {
+  type LuxeError,
+  LuxeErrors,
+  type luxeQuery,
+} from "../../../core/index.js";
+import { loggerSchema } from "../logger/index.js";
+import { baseConfigSchema } from "../config/index.js";
+import type { AddressInfo } from "node:net";
 
-const baseModuleSchema = z.object({
+export const baseModuleSchema = z.object({
   name: z
     .string()
     .min(1)
     .catch(() => {
       throw LuxeErrors.Config.MissingRequiredProperty("module", "name")();
     }),
-});
-
-const baseConfigSchema = z.object({
-  postgresUrl: z
-    .string()
-    .regex(
-      /(postgres(?:ql)?):\/\/(?:([^@\s]+)@)?([^\/\s]+)(?:\/(\w+))?(?:\?(.+))?/,
-    )
-    .catch(() => {
-      throw LuxeErrors.Config.InvalidPostgresUrl();
-    }),
-  astro: z
-    .custom<Omit<AstroUserConfig, "output" | "srcDir" | "root">>()
-    .optional(),
-  modules: z.array(baseModuleSchema),
 });
 
 export const lifecycleHooksSchema = z.object({
@@ -169,8 +156,4 @@ export const lifecycleHooksSchema = z.object({
 
 export const moduleSchema = baseModuleSchema.extend({
   hooks: lifecycleHooksSchema,
-});
-
-export const configSchema = baseConfigSchema.extend({
-  modules: z.array(moduleSchema),
 });

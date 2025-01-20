@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LuxeLog } from "../index.js";
+import { LuxeLog } from "../../../core/index.js";
 
 export const loggerSchema = z.custom<LuxeLog>(
   (data): data is LuxeLog => data instanceof LuxeLog,

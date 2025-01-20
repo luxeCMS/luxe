@@ -2,8 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { LuxeError, LuxeErrors } from "../errors/index.js";
-import type { LuxeUserConfig } from "./types/config.js";
-import { configSchema } from "./zod/config-schema.js";
+import type { LuxeUserConfig } from "../../types/index.js";
+import { configSchema } from "../../zod/core/config/index.js";
 
 /**
  * Find the root of the project by searching up for a package.json file.

@@ -3,19 +3,35 @@ import { LuxeError } from "../../core/errors/index.js";
 import type { LuxeConfig } from "../../core/index.js";
 
 export const astroDev = async (
-  options: LuxeConfig,
-  rootPath: string,
+  astroConfig: LuxeConfig["astro"],
 ): ReturnType<typeof dev> => {
   try {
     const devServer = await dev({
-      srcDir: rootPath,
-      root: rootPath,
+      srcDir: "./",
+      root: "./",
       output: "server",
+      integrations: [
+        {
+          name: "luxe-server",
+          hooks: {
+            "astro:config:setup": async (config) => {
+              config.injectRoute({
+                pattern: "/admin/[...slug]",
+                entrypoint: "./pages/admin.astro",
+              });
+              config.injectRoute({
+                pattern: "/api/[...slug]",
+                entrypoint: "./pages/api.ts",
+              });
+            },
+          },
+        },
+      ],
       server: {
         port: 5893,
       },
       ...Object.fromEntries(
-        Object.entries(options.astro ?? {}).filter(
+        Object.entries(astroConfig ?? {}).filter(
           ([key]) => key !== "root" && key !== "srcDir" && key !== "output",
         ),
       ),

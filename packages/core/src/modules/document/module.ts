@@ -1,4 +1,4 @@
-import type { Module } from "../../core/config/types/config.js";
+import type { Module } from "../../types/index.js";
 import { defineModule, defineModel, field } from "../../core/index.js";
 import type { DocumentModuleProps } from "./types/index.js";
 
@@ -9,6 +9,8 @@ import type { DocumentModuleProps } from "./types/index.js";
  */
 export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
   return defineModule("document", () => ({
+    // Models represent the database tables and the
+    // fields represent the columns in the tables
     models: [
       defineModel("documents", {
         id: field.uuid().primaryKey(),
@@ -35,34 +37,43 @@ export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
         updated_at: field.timestamp(),
       }),
     ],
+
     hooks: {
       "luxe:migrate:before": async (ctx) => {
-        ctx.logger.info("Objects module migrate before hook!");
+        ctx.logger.info("Document module migrate before hook!");
       },
       "luxe:migrate:start": async (ctx) => {
-        ctx.logger.info("Objects module migrate start hook!");
+        ctx.logger.info("Document module migrate start hook!");
       },
       "luxe:migrate:done": async (ctx) => {
-        ctx.logger.info("Objects module migrate done hook!");
+        ctx.logger.info("Document module migrate done hook!");
       },
       "luxe:migrate:error": async (ctx) => {
-        ctx.logger.info("Objects module migrate error hook!");
+        ctx.logger.info("Document module migrate error hook!");
       },
 
       "luxe:server:init": async (ctx) => {
-        ctx.logger.info("Objects module started!");
+        ctx.logger.info("Document module started!");
+        ctx.routes.push({
+          method: "GET",
+          path: "/documents",
+          handler: async (req, res) => {
+            const documents = await ctx.db.query(`SELECT * FROM documents;`);
+            res.status(200).json(documents);
+          },
+        });
       },
       "luxe:server:before": async (ctx) => {
-        ctx.logger.info("Objects module server before hook!");
+        ctx.logger.info("Document module server before hook!");
       },
       "luxe:server:ready": async (ctx) => {
-        ctx.logger.info("Objects module started!");
+        ctx.logger.info("Document module started!");
       },
       "luxe:server:close": async (ctx) => {
-        ctx.logger.info("Objects module stopped!");
+        ctx.logger.info("Document module stopped!");
       },
       "luxe:server:error": async (ctx) => {
-        ctx.logger.info("Objects module error!");
+        ctx.logger.info("Document module error!");
       },
     },
   }));

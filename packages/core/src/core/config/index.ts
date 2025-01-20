@@ -1,10 +1,8 @@
 import { resolve } from "node:path";
 import * as dotenv from "dotenv";
-import type { LuxeUserConfig } from "./types/config.js";
-import type { z } from "zod";
-import type { configSchema } from "./zod/config-schema.js";
 
 import { validateLuxeConfig, parseLuxeConfigFileInDir } from "./validate.js";
+import type { LuxeUserConfig } from "../../types/index.js";
 
 /**
  * Resolves the Luxe configuration object. This function loads the .env file
@@ -45,8 +43,6 @@ export const resolveConfig = async (cwd = process.cwd()) => {
  * });
  * ```
  */
-export function defineConfig(config: z.infer<typeof configSchema>) {
+export function defineConfig(config: LuxeUserConfig) {
   return config;
 }
-
-export type { LuxeUserConfig };
