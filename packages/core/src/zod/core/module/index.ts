@@ -1,32 +1,22 @@
+import type http from "node:http";
+import type { AddressInfo } from "node:net";
+import type * as vite from "vite";
 import { z } from "zod";
-import { LuxeErrors } from "../../errors/index.js";
-import { loggerSchema } from "../../logger/zod/logger-schema.js";
-import type postgres from "postgres";
-import type { luxeQuery } from "../../db/establish-db.js";
-import type { AstroUserConfig } from "astro";
+import {
+  type LuxeError,
+  LuxeErrors,
+  type luxeQuery,
+} from "../../../core/index.js";
+import { baseConfigSchema } from "../config/index.js";
+import { loggerSchema } from "../logger/index.js";
 
-const baseModuleSchema = z.object({
+export const baseModuleSchema = z.object({
   name: z
     .string()
     .min(1)
     .catch(() => {
       throw LuxeErrors.Config.MissingRequiredProperty("module", "name")();
     }),
-});
-
-const baseConfigSchema = z.object({
-  postgresUrl: z
-    .string()
-    .regex(
-      /(postgres(?:ql)?):\/\/(?:([^@\s]+)@)?([^\/\s]+)(?:\/(\w+))?(?:\?(.+))?/,
-    )
-    .catch(() => {
-      throw LuxeErrors.Config.InvalidPostgresUrl();
-    }),
-  astro: z
-    .custom<Omit<AstroUserConfig, "output" | "srcDir" | "root">>()
-    .optional(),
-  modules: z.array(baseModuleSchema),
 });
 
 export const lifecycleHooksSchema = z.object({
@@ -101,7 +91,7 @@ export const lifecycleHooksSchema = z.object({
     .args(
       z.object({
         logger: loggerSchema,
-        luxeQuery: z.custom<typeof luxeQuery>(),
+        query: z.custom<typeof luxeQuery>(),
       }),
     )
     .returns(z.void().or(z.promise(z.void())))
@@ -115,6 +105,19 @@ export const lifecycleHooksSchema = z.object({
     .args(
       z.object({
         logger: loggerSchema,
+        // This is the dev server returned by the `dev` command, copied from the `astro` package
+        server: z.object({
+          address: z.custom<AddressInfo>(),
+          handle: z
+            .function()
+            .args(
+              z.custom<http.IncomingMessage>(),
+              z.custom<http.ServerResponse<http.IncomingMessage>>(),
+            )
+            .returns(z.void()),
+          watcher: z.custom<vite.FSWatcher>(),
+          stop: z.function().returns(z.promise(z.void())),
+        }),
       }),
     )
     .returns(z.void().or(z.promise(z.void())))
@@ -128,7 +131,7 @@ export const lifecycleHooksSchema = z.object({
     .args(
       z.object({
         logger: loggerSchema,
-        error: z.any(),
+        error: z.custom<LuxeError>(),
       }),
     )
     .returns(z.void().or(z.promise(z.void())))
@@ -153,8 +156,4 @@ export const lifecycleHooksSchema = z.object({
 
 export const moduleSchema = baseModuleSchema.extend({
   hooks: lifecycleHooksSchema,
-});
-
-export const configSchema = baseConfigSchema.extend({
-  modules: z.array(moduleSchema),
 });

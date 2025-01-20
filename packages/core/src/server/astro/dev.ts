@@ -1,23 +1,37 @@
 import { dev } from "astro";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
 import { LuxeError } from "../../core/errors/index.js";
-import type { LuxeConfig } from "../../core/index.js";
+import type { LuxeConfig } from "../../types/index.js";
 
 export const astroDev = async (
-  options: LuxeConfig,
-  rootPath: string,
+  astroConfig: LuxeConfig["astro"],
 ): ReturnType<typeof dev> => {
   try {
     const devServer = await dev({
-      srcDir: path.join(fileURLToPath(new URL("../../src/astro", rootPath))),
-      root: path.join(fileURLToPath(new URL("../../src/astro", rootPath))),
+      srcDir: "./",
+      root: "./",
       output: "server",
+      integrations: [
+        {
+          name: "luxe-server",
+          hooks: {
+            "astro:config:setup": async (config) => {
+              config.injectRoute({
+                pattern: "/admin/[...slug]",
+                entrypoint: "./pages/admin.astro",
+              });
+              config.injectRoute({
+                pattern: "/api/[...slug]",
+                entrypoint: "./pages/api.ts",
+              });
+            },
+          },
+        },
+      ],
       server: {
         port: 5893,
       },
       ...Object.fromEntries(
-        Object.entries(options.astro ?? {}).filter(
+        Object.entries(astroConfig ?? {}).filter(
           ([key]) => key !== "root" && key !== "srcDir" && key !== "output",
         ),
       ),

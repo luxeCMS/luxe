@@ -1,26 +1,26 @@
 {
-  "name": "@luxecms/app",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "luxe-scripts dev --path=src/cli",
-    "build": "pnpm build:cli && pnpm build:client",
-    "build:client": "astro build",
-    "build:cli": "luxe-scripts build --path=src/cli"
-  },
-  "bin": {
-    "luxe": "./bin/luxe.js"
-  },
-  "exports": {
-    "./package.json": "./package.json",
-    "./astro": "./src/astro"
-  },
-  "dependencies": {
-    "@luxecms/core": "workspace:*",
-    "astro": "^5.1.3",
-    "citty": "^0.1.6"
-  },
-  "devDependencies": {
-    "luxe-scripts": "workspace:*"
-  }
+	"name": "@luxecms/app",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "luxe-scripts dev --path=src/cli",
+		"build": "pnpm build:cli && pnpm build:client",
+		"build:client": "astro build",
+		"build:cli": "luxe-scripts build --path=src/cli"
+	},
+	"bin": {
+		"luxe": "./bin/luxe.js"
+	},
+	"exports": {
+		"./package.json": "./package.json",
+		"./astro": "./src/astro"
+	},
+	"dependencies": {
+		"@luxecms/core": "workspace:*",
+		"astro": "^5.1.3",
+		"citty": "^0.1.6"
+	},
+	"devDependencies": {
+		"luxe-scripts": "workspace:*"
+	}
 }

@@ -9,6 +9,6 @@ export {
   resolveConfig,
   defineConfig,
   dev,
-  type LuxeConfig,
 } from "./core/index.js";
+export type { LuxeConfig, LuxeUserConfig } from "./types/index.js";
 export { z } from "zod";

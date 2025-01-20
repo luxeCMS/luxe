@@ -24,15 +24,6 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
 
-  examples/_test:
-    dependencies:
-      '@luxecms/app':
-        specifier: workspace:*
-        version: link:../../packages/app
-      '@luxecms/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-
   packages/app:
     dependencies:
       '@luxecms/core':
@@ -94,6 +85,9 @@ importers:
       luxe-scripts:
         specifier: workspace:*
         version: link:../luxe-scripts
+      vite:
+        specifier: ^6.0.7
+        version: 6.0.7(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0)
       vitest:
         specifier: ^2.1.8
         version: 2.1.8(@types/node@20.17.10)(terser@5.37.0)
@@ -3072,8 +3066,8 @@ packages:
       terser:
         optional: true
 
-  vite@6.0.6:
-    resolution: {integrity: sha512-NSjmUuckPmDU18bHz7QZ+bTYhRR0iA72cs2QAxCqDpafJ0S6qetco0LB3WW2OxlMHS0JmAv+yZ/R3uPmMyGTjQ==}
+  vite@6.0.7:
+    resolution: {integrity: sha512-RDt8r/7qx9940f8FcOIAH9PTViRrghKaK2K1jY3RaAURrEUbm9Du1mJ72G+jlhtG3WwodnfzY8ORQZbBavZEAQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -4315,8 +4309,8 @@ snapshots:
       unist-util-visit: 5.0.0
       unstorage: 1.14.3(db0@0.2.1(drizzle-orm@0.38.2(@types/pg@8.11.10)(pg@8.13.1)(postgres@3.4.5)))(ioredis@5.4.2)
       vfile: 6.0.3
-      vite: 6.0.6(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0)
-      vitefu: 1.0.4(vite@6.0.6(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0))
+      vite: 6.0.7(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0)
+      vitefu: 1.0.4(vite@6.0.7(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0))
       which-pm: 3.0.0
       xxhash-wasm: 1.1.0
       yargs-parser: 21.1.1
@@ -6176,7 +6170,7 @@ snapshots:
       fsevents: 2.3.3
       terser: 5.37.0
 
-  vite@6.0.6(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0):
+  vite@6.0.7(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0):
     dependencies:
       esbuild: 0.24.2
       postcss: 8.4.49
@@ -6187,9 +6181,9 @@ snapshots:
       jiti: 2.4.2
       terser: 5.37.0
 
-  vitefu@1.0.4(vite@6.0.6(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0)):
+  vitefu@1.0.4(vite@6.0.7(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0)):
     optionalDependencies:
-      vite: 6.0.6(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0)
+      vite: 6.0.7(@types/node@20.17.10)(jiti@2.4.2)(terser@5.37.0)
 
   vitest@2.1.8(@types/node@20.17.10)(terser@5.37.0):
     dependencies:

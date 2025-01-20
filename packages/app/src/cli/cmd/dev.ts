@@ -1,9 +1,9 @@
 import {
+  type LuxeConfig,
   LuxeError,
   LuxeLog,
-  type LuxeConfig,
-  resolveConfig,
   dev as luxeDev,
+  resolveConfig,
 } from "@luxecms/core";
 
 export type DevCmdOptions = {
@@ -21,7 +21,8 @@ const dev = async (options: DevCmdOptions) => {
   try {
     config = await resolveConfig();
     logger.debug("Loaded configuration successfully");
-    devServer = await luxeDev(config, logger, "../../astro");
+
+    devServer = await luxeDev(config, logger);
   } catch (error) {
     if (devServer) {
       await devServer.close();

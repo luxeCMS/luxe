@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import type { LuxeConfig, LuxeUserConfig } from "../../types/index.js";
+import { configSchema } from "../../zod/core/config/index.js";
 import { LuxeError, LuxeErrors } from "../errors/index.js";
-import type { LuxeUserConfig } from "./types/config.js";
-import { configSchema } from "./zod/config-schema.js";
 
 /**
  * Find the root of the project by searching up for a package.json file.
@@ -115,7 +115,7 @@ export const importConfigFile = async (
  * Read the Luxe configuration file from the root of the project.
  * @param cwd the current working directory (default: process.cwd())
  * @returns the LuxeCoreConfig object
- * @throws {LuxeConfigError} if the configuration file is not found or invalid
+ * @throws {LuxeError} if the configuration file is not found or invalid
  */
 export const parseLuxeConfigFileInDir = async (
   cwd = process.cwd(),
@@ -158,7 +158,9 @@ export const parseLuxeConfigFileInDir = async (
  * @returns the validated configuration object
  * @throws {LuxeError} if the configuration object is invalid
  */
-export const validateLuxeConfig = <T extends LuxeUserConfig>(config: T) => {
+export const validateLuxeConfig = <T extends LuxeUserConfig>(
+  config: T,
+): LuxeConfig => {
   const validatedConfig = configSchema.parse(config);
 
   if (!validatedConfig) {
@@ -174,5 +176,5 @@ export const validateLuxeConfig = <T extends LuxeUserConfig>(config: T) => {
     moduleNames.add(module.name);
   }
 
-  return validatedConfig;
+  return { ...validatedConfig, astro: validatedConfig.astro ?? {} };
 };

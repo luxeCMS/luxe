@@ -1,17 +1,13 @@
+import { astroDev } from "../../server/index.js";
+import type { LuxeConfig } from "../../types/index.js";
 import {
+  type LuxeLog,
   establishLuxeDatabaseConnection,
   initializeLuxeDatabase,
-  type LuxeLog,
-  type LuxeConfig,
   luxeQuery,
 } from "../index.js";
-import { astroDev } from "../../server/index.js";
 
-export const dev = async (
-  config: LuxeConfig,
-  logger: LuxeLog,
-  astroProjectRoot: string,
-) => {
+export const dev = async (config: LuxeConfig, logger: LuxeLog) => {
   // this doesn't establish a usable connection
   await initializeLuxeDatabase(config.postgresUrl);
   logger.debug("Database initialized successfully");
@@ -38,13 +34,19 @@ export const dev = async (
   // Load the core modules
   for (const module of config.modules) {
     if (module.hooks?.["luxe:server:before"]) {
-      await module.hooks["luxe:server:before"]({ logger, luxeQuery });
+      await module.hooks["luxe:server:before"]({ logger, query: luxeQuery });
     }
   }
 
   logger.debug("Initialized module `luxe:server:before` hooks successfully");
 
-  const devServer = await astroDev(config, astroProjectRoot);
+  const devServer = await astroDev(config.astro);
+
+  for (const module of config.modules) {
+    if (module.hooks?.["luxe:server:ready"]) {
+      await module.hooks["luxe:server:ready"]({ logger, server: devServer });
+    }
+  }
 
   return {
     close: async () => {
