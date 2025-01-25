@@ -1,3 +1,5 @@
+import { default as libPath } from "node:path";
+import fs from "node:fs";
 import * as esbuild from "esbuild";
 import { glob } from "glob";
 import kleur from "kleur";
@@ -9,6 +11,10 @@ async function build(...args) {
   const dts = args.includes("--dts");
   const runServer = args.includes("--server");
   const joinedArgs = args.join(" ");
+  const astroBuild = /--astroPages=[^ ]*/
+    .exec(joinedArgs)?.[0]
+    .trim()
+    .replace("--astroPages=", "");
   const path = /--path=[^ ]*/
     .exec(joinedArgs)?.[0]
     .trim()
@@ -67,6 +73,24 @@ async function build(...args) {
                   return;
                 }
 
+                if (astroBuild) {
+                  const astroPagesPath = libPath.join(
+                    libPath.dirname(process.cwd()),
+                    astroBuild,
+                  );
+                  if (!fs.existsSync(astroPagesPath)) {
+                    log.error("Astro pages path does not exist");
+                  } else {
+                    const distPath = libPath.join(
+                      libPath.dirname(process.cwd()),
+                      astroBuild.split("/")[1],
+                      "dist",
+                    );
+                    await x("cp", ["-r", astroPagesPath, distPath]);
+                  }
+                  log.debug("Building Astro");
+                }
+
                 if (dts) {
                   log.debug("Generating type definitions");
                   await x("tsc", ["--emitDeclarationOnly", "--declaration"]);
@@ -116,6 +140,23 @@ async function build(...args) {
           ...(path ? { entryPoints: [`${path}/**/*.ts`] } : {}),
         }),
         (async () => {
+          if (astroBuild) {
+            const astroPagesPath = libPath.join(
+              libPath.dirname(process.cwd()),
+              astroBuild,
+            );
+            if (!fs.existsSync(astroPagesPath)) {
+              log.error("Astro pages path does not exist");
+            } else {
+              const distPath = libPath.join(
+                libPath.dirname(process.cwd()),
+                astroBuild.split("/")[1],
+                "dist",
+              );
+              await x("cp", ["-r", astroPagesPath, distPath]);
+            }
+            log.debug("Building Astro");
+          }
           if (dts) {
             log.info("Generating type definitions");
             if (tsconfig) {
