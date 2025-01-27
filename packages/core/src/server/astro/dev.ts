@@ -1,11 +1,16 @@
-import { dev } from "astro";
-import { LuxeError } from "../../core/errors/index.js";
-import type { LuxeConfig } from "../../types/index.js";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { dev } from "astro";
+import { LuxeError } from "../../core/errors/index.js";
+import type { LuxeConfig, LuxeRoute } from "../../types/index.js";
+
+export type LuxeAstroConfig = {
+  routes: Array<LuxeRoute>;
+};
 
 export const astroDev = async (
   astroConfig: LuxeConfig["astro"],
+  luxeAstroConfig: LuxeAstroConfig,
 ): ReturnType<typeof dev> => {
   try {
     const currentDir = dirname(fileURLToPath(import.meta.url))
@@ -21,14 +26,13 @@ export const astroDev = async (
           name: "luxe-server",
           hooks: {
             "astro:config:setup": async (config) => {
-              config.injectRoute({
-                pattern: "/admin/[...slug]",
-                entrypoint: join(currentDir, "pages", "admin.astro"),
-              });
-              config.injectRoute({
-                pattern: "/api/[...slug]",
-                entrypoint: join(currentDir, "pages", "api.ts"),
-              });
+              for (const route of luxeAstroConfig.routes) {
+                console.log(route);
+                config.injectRoute({
+                  pattern: `${route.type}/${route.pattern}`,
+                  entrypoint: route.entrypoint,
+                });
+              }
             },
           },
         },

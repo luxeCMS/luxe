@@ -7,7 +7,6 @@ import {
   LuxeErrors,
   type luxeQuery,
 } from "../../../core/index.js";
-import { baseConfigSchema } from "../config/index.js";
 import { loggerSchema } from "../logger/index.js";
 
 export const baseModuleSchema = z.object({
@@ -77,7 +76,7 @@ export const lifecycleHooksSchema = z.object({
     .args(
       z.object({
         logger: loggerSchema,
-        config: baseConfigSchema,
+        injectRoute: z.function().args(z.any()).returns(z.void()),
       }),
     )
     .returns(z.void().or(z.promise(z.void())))

@@ -1,5 +1,5 @@
 import { astroDev } from "../../server/index.js";
-import type { LuxeConfig } from "../../types/index.js";
+import type { LuxeConfig, LuxeRoute } from "../../types/index.js";
 import {
   type LuxeLog,
   establishLuxeDatabaseConnection,
@@ -8,6 +8,12 @@ import {
 } from "../index.js";
 
 export const dev = async (config: LuxeConfig, logger: LuxeLog) => {
+  const routes: Array<LuxeRoute> = [];
+
+  const injectRoute = (route: LuxeRoute) => {
+    routes.push(route);
+  };
+
   // this doesn't establish a usable connection
   await initializeLuxeDatabase(config.postgresUrl);
   logger.debug("Database initialized successfully");
@@ -16,14 +22,7 @@ export const dev = async (config: LuxeConfig, logger: LuxeLog) => {
     if (module.hooks?.["luxe:server:init"]) {
       await module.hooks["luxe:server:init"]({
         logger,
-        // Don't want users to alter the module hooks, so we exclude them
-        config: {
-          ...config,
-          modules: config.modules.map((m) => ({
-            ...m,
-            hooks: undefined,
-          })),
-        },
+        injectRoute,
       });
     }
   }
@@ -40,7 +39,9 @@ export const dev = async (config: LuxeConfig, logger: LuxeLog) => {
 
   logger.debug("Initialized module `luxe:server:before` hooks successfully");
 
-  const devServer = await astroDev(config.astro);
+  const devServer = await astroDev(config.astro, {
+    routes,
+  });
 
   for (const module of config.modules) {
     if (module.hooks?.["luxe:server:ready"]) {

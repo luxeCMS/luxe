@@ -1,3 +1,4 @@
+import { dirname, join } from "node:path";
 import { defineModel, defineModule, field } from "../../core/index.js";
 import type { Module } from "../../types/index.js";
 import type { DocumentModuleProps } from "../../zod/modules/documents/index.js";
@@ -53,17 +54,8 @@ export const DocumentModule = ({ schemas }: DocumentModuleProps): Module => {
       "luxe:migrate:error": async (ctx) => {
         ctx.logger.info("Document module migrate error hook!");
       },
-
       "luxe:server:init": async (ctx) => {
         ctx.logger.info("Document module started!");
-        // ctx.routes.push({
-        //   method: "GET",
-        //   path: "/documents",
-        //   handler: async (req, res) => {
-        //     const documents = await ctx.db.query(`SELECT * FROM documents;`);
-        //     res.status(200).json(documents);
-        //   },
-        // });
       },
       "luxe:server:before": async (ctx) => {
         ctx.logger.info("Document module server before hook!");

@@ -23,3 +23,9 @@ export type LuxeConfig = {
 };
 
 export type LuxeUserConfig = Partial<LuxeConfig>;
+
+export type LuxeRoute = {
+  type: "api" | "admin";
+  pattern: string;
+  entrypoint: string;
+};
