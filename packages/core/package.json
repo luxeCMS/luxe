@@ -4,7 +4,7 @@
   "description": "The first truly composable headless CMS built for the modular web.",
   "type": "module",
   "scripts": {
-    "dev": "luxe-scripts dev --dts --astroPages=./core/src/server/astro/pages",
+    "dev": "luxe-scripts dev --dts --astroPagesPattern=**/src/**/pages/**",
     "build": "luxe-scripts build --dts",
     "test": "vitest"
   },

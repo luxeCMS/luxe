@@ -2,7 +2,7 @@ import type { AstroUserConfig } from "astro";
 import type postgres from "postgres";
 import { z } from "zod";
 import { LuxeErrors } from "../../../core/index.js";
-import { baseModuleSchema, moduleSchema } from "../module/index.js";
+import { moduleSchema } from "../module/index.js";
 
 export const baseConfigSchema = z.object({
   postgresUrl: z
@@ -16,7 +16,6 @@ export const baseConfigSchema = z.object({
   astro: z
     .custom<Omit<AstroUserConfig, "output" | "srcDir" | "root">>()
     .optional(),
-  modules: z.array(baseModuleSchema),
 });
 
 export const configSchema = baseConfigSchema.extend({

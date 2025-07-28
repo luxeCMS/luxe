@@ -1,9 +1,10 @@
-import { default as libPath } from "node:path";
 import fs from "node:fs";
+import { default as libPath } from "node:path";
 import * as esbuild from "esbuild";
 import { glob } from "glob";
 import kleur from "kleur";
 import { x } from "tinyexec";
+import fg from "fast-glob";
 
 async function build(...args) {
   const isDev = args.includes("--dev");
@@ -11,10 +12,10 @@ async function build(...args) {
   const dts = args.includes("--dts");
   const runServer = args.includes("--server");
   const joinedArgs = args.join(" ");
-  const astroBuild = /--astroPages=[^ ]*/
+  const astroPattern = /--astroPagesPattern=[^ ]*/
     .exec(joinedArgs)?.[0]
     .trim()
-    .replace("--astroPages=", "");
+    .replace("--astroPagesPattern=", "");
   const path = /--path=[^ ]*/
     .exec(joinedArgs)?.[0]
     .trim()
@@ -73,21 +74,36 @@ async function build(...args) {
                   return;
                 }
 
-                if (astroBuild) {
-                  const astroPagesPath = libPath.join(
-                    libPath.dirname(process.cwd()),
-                    astroBuild,
-                  );
-                  if (!fs.existsSync(astroPagesPath)) {
-                    log.error("Astro pages path does not exist");
-                  } else {
-                    const distPath = libPath.join(
-                      libPath.dirname(process.cwd()),
-                      astroBuild.split("/")[1],
-                      "dist",
-                    );
-                    await x("cp", ["-r", astroPagesPath, distPath]);
+                if (astroPattern) {
+                  const files = await fg.glob([
+                    `${astroPattern}/*.ts`,
+                    `${astroPattern}/*.astro`,
+                  ]);
+                  const distPath = libPath.join(process.cwd(), "dist", "pages");
+                  if (!fs.existsSync(distPath)) {
+                    await x("mkdir", ["-p", distPath]);
+                    await x("rm", ["-rf", distPath]);
                   }
+
+                  for (const file of files) {
+                    const filePath = file.split("pages")[1];
+                    // If file already exists in destination folder, show a warning
+                    if (fs.existsSync(libPath.join(distPath, filePath))) {
+                      log.warn(
+                        `File ${libPath.join(
+                          distPath,
+                          filePath,
+                        )} already exists in destination folder; overwriting`,
+                      );
+                    }
+                    const distFolder = libPath.join(
+                      distPath,
+                      libPath.dirname(file).split("pages")[1],
+                    );
+                    await x("mkdir", ["-p", distFolder]);
+                    await x("cp", [file, distFolder]);
+                  }
+
                   log.debug("Building Astro");
                 }
 
@@ -140,21 +156,36 @@ async function build(...args) {
           ...(path ? { entryPoints: [`${path}/**/*.ts`] } : {}),
         }),
         (async () => {
-          if (astroBuild) {
-            const astroPagesPath = libPath.join(
-              libPath.dirname(process.cwd()),
-              astroBuild,
-            );
-            if (!fs.existsSync(astroPagesPath)) {
-              log.error("Astro pages path does not exist");
-            } else {
-              const distPath = libPath.join(
-                libPath.dirname(process.cwd()),
-                astroBuild.split("/")[1],
-                "dist",
-              );
-              await x("cp", ["-r", astroPagesPath, distPath]);
+          if (astroPattern) {
+            const files = await fg.glob([
+              `${astroPattern}/*.ts`,
+              `${astroPattern}/*.astro`,
+            ]);
+            const distPath = libPath.join(process.cwd(), "dist", "pages");
+            if (!fs.existsSync(distPath)) {
+              await x("mkdir", ["-p", distPath]);
+              await x("rm", ["-rf", distPath]);
             }
+
+            for (const file of files) {
+              const filePath = file.split("pages")[1];
+              // If file already exists in destination folder, show a warning
+              if (fs.existsSync(libPath.join(distPath, filePath))) {
+                log.warn(
+                  `File ${libPath.join(
+                    distPath,
+                    filePath,
+                  )} already exists in destination folder; overwriting`,
+                );
+              }
+              const distFolder = libPath.join(
+                distPath,
+                libPath.dirname(file).split("pages")[1],
+              );
+              await x("mkdir", ["-p", distFolder]);
+              await x("cp", [file, distFolder]);
+            }
+
             log.debug("Building Astro");
           }
           if (dts) {

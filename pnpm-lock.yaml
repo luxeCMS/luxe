@@ -24,6 +24,15 @@ importers:
         specifier: ^5.7.2
         version: 5.7.2
 
+  examples/_test:
+    dependencies:
+      '@luxecms/app':
+        specifier: workspace:*
+        version: link:../../packages/app
+      '@luxecms/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+
   packages/app:
     dependencies:
       '@luxecms/core':
@@ -138,6 +147,9 @@ importers:
       esbuild:
         specifier: ^0.24.0
         version: 0.24.0
+      fast-glob:
+        specifier: ^3.3.3
+        version: 3.3.3
       glob:
         specifier: ^11.0.0
         version: 11.0.0
@@ -1897,6 +1909,10 @@ packages:
 
   fast-glob@3.3.2:
     resolution: {integrity: sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==}
+    engines: {node: '>=8.6.0'}
+
+  fast-glob@3.3.3:
+    resolution: {integrity: sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==}
     engines: {node: '>=8.6.0'}
 
   fastq@1.17.1:
@@ -4746,6 +4762,14 @@ snapshots:
       tmp: 0.0.33
 
   fast-glob@3.3.2:
+    dependencies:
+      '@nodelib/fs.stat': 2.0.5
+      '@nodelib/fs.walk': 1.2.8
+      glob-parent: 5.1.2
+      merge2: 1.4.1
+      micromatch: 4.0.8
+
+  fast-glob@3.3.3:
     dependencies:
       '@nodelib/fs.stat': 2.0.5
       '@nodelib/fs.walk': 1.2.8

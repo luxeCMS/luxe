@@ -1,10 +1,10 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
+import type { PgColumn, PgTableWithColumns } from "drizzle-orm/pg-core";
 import type { FSWatcher } from "vite";
 import type { LuxeError, LuxeLog, luxeQuery } from "../../../core/index.js";
-import type { LuxeConfig } from "../config/index.js";
+import type { LuxeConfig, LuxeRoute } from "../config/index.js";
 import type { Model } from "../models/index.js";
-import type { PgColumn, PgTableWithColumns } from "drizzle-orm/pg-core";
 
 /*
  * The reason we have a type for Module and a Zod type is so we can add comments to the types.
@@ -111,10 +111,10 @@ export type Module = {
      */
     "luxe:server:init"?: ({
       logger,
-      config,
+      injectRoute,
     }: {
       logger: LuxeLog;
-      config: LuxeConfig;
+      injectRoute: (route: LuxeRoute) => void;
     }) => void | Promise<void>;
 
     /**
