@@ -1,4 +1,3 @@
-import { dirname, join } from "node:path";
 import { defineModel, defineModule, field } from "../../core/index.js";
 import type { Module } from "../../types/index.js";
 import type { DocumentModuleProps } from "../../zod/modules/documents/index.js";
