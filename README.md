@@ -7,7 +7,7 @@ The first truly composable headless CMS built for the modular web.
 [![GitHub license](https://img.shields.io/github/license/luxeCMS/luxe)](https://github.com/luxeCMS/luxe/blob/759f622655fb59b374ad3feb497922e104d8c232/LICENSE.md)
 [![Discord](https://img.shields.io/discord/1315711442669928580?label=Discord&logo=discord)](https://discord.gg/6XzN3e8VCk)
 
-> **Note:** LuxeCMS is under active development and is not production-ready. Join our [Discord](https://discord.gg/6XzN3e8VCk) to stay updated on the first stable release. We are also looking for contributors! 🚀 Reach out over Discord if you're interested.
+> **Update [April 2026]**: On hold. I underestimated the scope of this project and hit the edges of what I currently know well enough to build right. Rather than ship something I'm not proud of, I'm pausing LuxeCMS to close some gaps first.
 
 </div>
 
